@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.github.mikkoi</groupId>
+    <artifactId>maven-enforcer-rule-depend-on-all-projects-set-003</artifactId>
+    <version>@project.version@</version>
+    <packaging>pom</packaging>
+    <name>Maven Enforcer Rule dependOnAllProjects - Integration Test - set-003</name>
+    <description>Integration Test. Set 001</description>
+
+    <modules>
+        <module>other</module>
+        <module>subproject</module>
+        <module>z-aggregation</module>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <java.version>@java.version@</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven.compiler.testSource>${java.version}</maven.compiler.testSource>
+        <maven.compiler.testTarget>${java.version}</maven.compiler.testTarget>
+        <maven.compiler.debug>true</maven.compiler.debug>
+
+        <!-- Plugins -->
+
+        <!-- Dependencies -->
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.github.mikkoi</groupId>
+                <artifactId>other</artifactId>
+                <version>@project.version@</version>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>com.github.mikkoi</groupId>
+                <artifactId>other-second</artifactId>
+                <version>@project.version@</version>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>com.github.mikkoi</groupId>
+                <artifactId>other-second-fifth</artifactId>
+                <version>@project.version@</version>
+                <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>com.github.mikkoi</groupId>
+                <artifactId>other-second-fourth</artifactId>
+                <version>@project.version@</version>
+                <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>com.github.mikkoi</groupId>
+                <artifactId>other-second-third</artifactId>
+                <version>@project.version@</version>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>com.github.mikkoi</groupId>
+                <artifactId>subproject</artifactId>
+                <version>@project.version@</version>
+                <type>jar</type>
+            </dependency>
+            <dependency>
+                <groupId>com.github.mikkoi</groupId>
+                <artifactId>z-aggregation</artifactId>
+                <version>@project.version@</version>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>3.6.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>2.5.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.12.4</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-toolchains-plugin</artifactId>
+                    <version>3.1.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.8.13</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>
