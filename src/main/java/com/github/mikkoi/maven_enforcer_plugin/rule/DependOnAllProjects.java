@@ -22,11 +22,15 @@ import java.util.function.Predicate;
 @Named("dependOnAllProjects")
 public class DependOnAllProjects extends AbstractEnforcerRule {
 
+    /** Constant value
+     * Size of indentation inside a &lt;dependency>&gt; definition.
+     */
+    private static final String INDENT_DEPENDENCY = "    ";
+
     /**
      * Include by project [groupId:]artifactId[:packagingType].
      * Default value: all projects included.
      */
-//    @Parameter(property = "projects" + ".addInternal" + ".includes")
     private List<String> includes;
 
     /**
@@ -35,24 +39,26 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
      * If includes list contains any items, they are evaluated first.
      * Then excludes are excluded from them.
      */
-//    @Parameter(property = "projects" + ".addInternal" + ".excludes")
     List<String> excludes;
 
     /**
      * Error if unknown project in includes/excludes.
      * If a wildcard (*) is used in the name, this parameter has no effect.
      */
-//    @Parameter(property = "projects" + ".errorIfUnknownProject", defaultValue = "true")
+    @SuppressWarnings("unused")
     private boolean errorIfUnknownProject;
 
     /**
      * Include Maven root project
      */
+    @SuppressWarnings("unused")
     private boolean includeRootProject;
 
     // Inject needed Maven components
+    @SuppressWarnings("unused")
     private final MavenProject mavenProject;
     private final MavenSession mavenSession;
+    @SuppressWarnings("unused")
     private final RuntimeInformation runtimeInformation;
 
     @Inject
@@ -91,6 +97,7 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
             if (a == null) {
                 throw new EnforcerRuleException("Failure in parameter 'excludes'. String is null");
             }
+            // TODO
             // If the String is a full dependency name without wildcards,
             // check that the dependency exists among the projects in the build.
             // If not, throw EnforcerRuleException.
@@ -122,13 +129,6 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
             getLog().debug("    " + projectId);
 
             if(isIncluded(project)) {
-//                if(
-//                        !projectsAreEquals(project, currentProject)
-//                        && !( projectsAreEquals(project, mavenSession.getTopLevelProject()) && !this.includeRootProject )
-//                ) {
-//                    includedProjects.add(project);
-//                }
-
                 if(
                         projectsAreEquals(project, currentProject)
                                 || ( !this.includeRootProject && projectsAreEquals(project, mavenSession.getTopLevelProject()) )
@@ -148,18 +148,49 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
             }
         }
         if(!missingProjects.isEmpty()) {
-            StringBuilder error = new StringBuilder();
+            List<String> errors = new ArrayList<>(missingProjects.size());
             for (MavenProject missingProject : missingProjects) {
-                error.append(String.format("Project '%s:%s' missing from dependencies.",
+                errors.add(String.format("Project '%s:%s' is missing dependency '%s:%s:%s'.",
+                        currentProject.getGroupId(),
+                        currentProject.getArtifactId(),
                         missingProject.getGroupId(),
-                        missingProject.getArtifactId()
+                        missingProject.getArtifactId(),
+                        missingProject.getPackaging()
                 ));
             }
-            throw new EnforcerRuleException(error.toString());
+            StringBuilder sb = new StringBuilder();
+            sb.append(String.format("Missing definitions from the project '%s:%s':", currentProject.getGroupId(), currentProject.getArtifactId()));
+            sb.append(System.lineSeparator());
+            sb.append("<!--     Created by Maven Enforcer rule dependOnAllProjects     --->");
+            sb.append(System.lineSeparator());
+            for (MavenProject missingProject : missingProjects) {
+                sb.append(formatDependency(projectToDependency(missingProject), INDENT_DEPENDENCY));
+                sb.append(System.lineSeparator());
+            }
+            sb.append("<!--     / Created by Maven Enforcer rule dependOnAllProjects     --->");
+            errors.add(sb.toString());
+            throw new EnforcerRuleException(String.join("\n", errors));
         }
         getLog().debug("End of iterate");
     }
 
+    /**
+     * Format a dependency definition
+     * User can simply copy-paste this to the project.
+     */
+    public static String formatDependency(Dependency dependency, String indent) {
+        final String newLine = System.lineSeparator();
+        final StringBuilder sb = new StringBuilder();
+        sb.append("<dependency>").append(newLine);
+        sb.append(indent).append(String.format("<groupId>%s</groupId>", dependency.getGroupId())).append(newLine);
+        sb.append(indent).append(String.format("<artifactId>%s</artifactId>", dependency.getArtifactId())).append(newLine);
+        // .append(indent).append(String.format("<version>%s</version>", dependency.getVersion())).append(newLine)
+        if(!"jar".equals(dependency.getType())) {
+            sb.append(indent).append(String.format("<type>%s</type>", dependency.getType())).append(newLine);
+        }
+        sb.append("</dependency>");
+        return sb.toString();
+    }
     /**
      * The main entry point for rule.
      */
@@ -187,8 +218,9 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
     @Override
     public String getCacheId() {
         //no hash on boolean...only parameter so no hash is needed.
-//        return Boolean.toString(shouldIfail);
+//        return Boolean.toString(shouldIFail);
 
+        // TODO
         // Parameters + current project dependencies + all maven projects in the build
         return "1";
     }

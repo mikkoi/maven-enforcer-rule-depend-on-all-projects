@@ -29,10 +29,10 @@
             <groupId>com.github.mikkoi</groupId>
             <artifactId>other-second-fifth</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.github.mikkoi</groupId>
-            <artifactId>other-second-fourth</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.github.mikkoi</groupId>-->
+<!--            <artifactId>other-second-fourth</artifactId>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.github.mikkoi</groupId>
             <artifactId>other-second-third</artifactId>

@@ -573,11 +573,12 @@
                         <phase>verify</phase>
                         <configuration>
                             <failOnError>false</failOnError>
-                            <!--                                <includeFilterFile>spotbugs-security-include.xml</includeFilterFile>-->
-                            <!--                                <excludeFilterFile>spotbugs-security-exclude.xml</excludeFilterFile>-->
                         </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <excludeFilterFile>spotbugs-security-exclude.xml</excludeFilterFile>
+                </configuration>
             </plugin>
 
         </plugins>
