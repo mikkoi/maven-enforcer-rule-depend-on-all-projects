@@ -407,6 +407,7 @@
                                 <version>${spotbugs.plugin.fb-contrib.version}</version>
                             </plugin>
                         </plugins>
+                        <effort>max</effort>
                     </configuration>
                 </plugin>
 
@@ -614,8 +615,22 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <configuration>
+                    <xmlOutput>true</xmlOutput>
+                    <!-- Optional directory to put spotbugs XDoc xml report -->
+                    <xmlOutputDirectory>target/site</xmlOutputDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+            </plugin>
         </plugins>
     </reporting>
+
     <profiles>
         <!-- Instructions -->
         <!-- Release (bump version) -->
