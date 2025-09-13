@@ -1,0 +1,59 @@
+name: Release
+# Release only happens from branch main.
+# The current SNAPSHOT version is upgraded to full version.
+# If you need to skip to a next minor or major release,
+# use versions plugin to create a new SNAPSHOT of that version
+# and commit it via a PR like normal.
+# Action here:
+# 1. prepare release, i.e. create release commit and next version commit.
+# 2. release, i.e. sign package and publish to Maven Central.
+# 3. release, site
+# 4. Do sonar qube analysis, same which is done for PRs.
+on:
+  release:
+    types: [created]
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      MAVEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
+      MAVEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
+      MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_SIGNING_KEY_PASSWORD }}
+    steps:
+      - id: checkout-repository
+        name: Checkout repository
+        uses: actions/checkout@v5
+      - id: setup-java
+        name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+          server-id: 'central'
+          server-username: 'MAVEN_USERNAME'
+          server-password: 'MAVEN_PASSWORD'
+          gpg-private-key: ${{ secrets.GPG_SIGNING_KEY }}
+          gpg-passphrase: 'MAVEN_GPG_PASSPHRASE'
+      - id: configure-user-and-gpg
+        name: Configure User and GPG
+        # Create the user which does the release commits.
+        run: |
+          git config --local user.name "Developer - Mikko Koivunalho"
+          git config --local user.email "mikkoi@dev.email.kapsi.fi"
+          git config --local user.signingkey F3748A46
+          git config --local commit.gpgsign true
+      - id: release-prepare
+        name: Create And Commit Release Commits
+        # Leave behind the release.properties file
+        run: |
+          mvn --batch-mode -DskipTests -Dspotbugs.skip release:prepare
+      - id: release-perform
+        name: Publish Jar And Site
+        # Deletes the release.properties file if successful release
+        run: |
+          mvn --batch-mode                                                     \
+            --activate-profiles mikkoi-ossrh,publish,release                   \
+            -Dgoals='deploy'                                                   \
+            -Darguments'-DskipTests -Dpmd.skip -Dspotbugs.skip'                \
+            release:perform
