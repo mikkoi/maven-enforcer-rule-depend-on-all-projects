@@ -43,6 +43,13 @@ jobs:
           git config --local user.email "mikkoi@dev.email.kapsi.fi"
           git config --local user.signingkey F3748A46
           git config --local commit.gpgsign true
+      - id: import-gpg-key
+        name: Import GPG key
+        env:
+          GPG_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+        run: |
+          echo "$GPG_KEY" | gpg --import
+          gpg --list-secret-keys
       - id: release-prepare
         name: Create And Commit Release Commits
         # Leave behind the release.properties file
