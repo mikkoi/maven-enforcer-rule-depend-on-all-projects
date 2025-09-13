@@ -9,21 +9,23 @@
 name: Java CI with Maven
 
 on:
-  push:
-    branches: [ "main" ]
+#  push:
+#    branches: [ "main" ]
   pull_request:
-    branches: [ "main", "feature-*", "bugfix-*" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - name: Set up JDK 11
+      - id: checkout-repository
+        name: Checkout repository
+        uses: actions/checkout@v5
+      - id: setup-java
+        name: Setup Java
         uses: actions/setup-java@v5
         with:
-          java-version: '11'
           distribution: 'temurin'
+          java-version: '21'
           cache: 'maven'
       - name: Build with Maven
         run:  mvn --batch-mode --fail-never --file pom.xml verify
