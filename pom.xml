@@ -21,10 +21,10 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git://github.com/mikkoi/maven-enforcer-rule-depend-on-all-projects.git</connection>
-        <developerConnection>scm:git:git@github.com:mikkoi/maven-enforcer-rule-depend-on-all-projects.git</developerConnection>
+        <connection>scm:git:${project.scm.url}</connection>
+        <developerConnection>scm:git:${project.scm.url}</developerConnection>
         <tag>HEAD</tag>
-        <url>https://github.com/mikkoi/maven-enforcer-rule-depend-on-all-projects</url>
+        <url>https://github.com/mikkoi/maven-enforcer-rule-depend-on-all-projects.git</url>
     </scm>
 
     <issueManagement>

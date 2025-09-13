@@ -10,11 +10,13 @@ name: Release
 # 3. release, site
 # 4. Do sonar qube analysis, same which is done for PRs.
 on:
-  release:
-    types: [created]
+  workflow_dispatch:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: write
     env:
       MAVEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
       MAVEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
@@ -23,6 +25,8 @@ jobs:
       - id: checkout-repository
         name: Checkout repository
         uses: actions/checkout@v5
+        with:
+          ref: 'main'
       - id: setup-java
         name: Setup Java
         uses: actions/setup-java@v5
@@ -35,26 +39,42 @@ jobs:
           server-password: 'MAVEN_PASSWORD'
           gpg-private-key: ${{ secrets.GPG_SIGNING_KEY }}
           gpg-passphrase: 'MAVEN_GPG_PASSPHRASE'
-      - id: configure-user-and-gpg
-        name: Configure User and GPG
-        # Create the user which does the release commits.
-        run: |
-          git config --local user.name "Developer - Mikko Koivunalho"
-          git config --local user.email "mikkoi@dev.email.kapsi.fi"
-          git config --local user.signingkey F3748A46
-          git config --local commit.gpgsign true
+#      - id: configure-user-and-gpg
+#        name: Configure User and GPG
+#        # Create the user which does the release commits.
+#        run: |
+#          git config --local user.name "Developer - Mikko Koivunalho"
+#          git config --local user.email "mikkoi@dev.email.kapsi.fi"
+#          git config --local user.signingkey F3748A46
+#          git config --local commit.gpgsign true
+#      - id: import-gpg-key
+#        name: Import GPG key
+#        env:
+#          GPG_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+#          GPG_PASSPHRASE: ${{ secrets.GPG_SIGNING_KEY_PASSWORD }}
+#        run: |
+#          echo "$GPG_KEY" | gpg --import
+#          gpg --list-secret-keys
+#          cat >>~/.gnupg/gpg-agent.conf <<EOF
+#          allow-loopback-pinentry
+#          EOF
+#          gpg-connect-agent reloadagent /bye
       - id: import-gpg-key
         name: Import GPG key
-        env:
-          GPG_KEY: ${{ secrets.GPG_SIGNING_KEY }}
-        run: |
-          echo "$GPG_KEY" | gpg --import
-          gpg --list-secret-keys
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_SIGNING_KEY }}
+          passphrase: ${{ secrets.GPG_SIGNING_KEY_PASSWORD }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+          git_tag_gpgsign: true
       - id: release-prepare
         name: Create And Commit Release Commits
         # Leave behind the release.properties file
         run: |
-          mvn --batch-mode -DskipTests -Dspotbugs.skip release:prepare
+          \git remote -v
+          \git config --list
+          mvn -X --batch-mode -DskipTests -Dspotbugs.skip release:prepare
       - id: release-perform
         name: Publish Jar And Site
         # Deletes the release.properties file if successful release
