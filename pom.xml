@@ -610,9 +610,6 @@
     </reporting>
 
     <profiles>
-        <!-- Instructions -->
-        <!-- Release (bump version) -->
-        <!-- mvn -\-activate-profiles ossrh,publish deploy -->
         <profile>
             <id>publish</id>
             <build>
@@ -628,6 +625,11 @@
                                 </goals>
                             </execution>
                         </executions>
+                        <configuration>
+                            <bestPractices>true</bestPractices>
+                            <keyname>F3748A46</keyname>
+                            <useAgent>true</useAgent>
+                        </configuration>
                     </plugin>
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
@@ -635,6 +637,7 @@
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>central</publishingServerId>
+                            <autoPublish>true</autoPublish>
                         </configuration>
                     </plugin>
                 </plugins>
