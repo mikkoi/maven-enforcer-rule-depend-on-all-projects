@@ -1,0 +1,17 @@
+<document xmlns="http://maven.apache.org/changes/2.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/changes/2.0.0 https://maven.apache.org/xsd/changes-2.0.0.xsd">
+    <properties>
+        <title>Maven Enforcer Plugin Rule dependOnAllProjects - Changes</title>
+        <author email="mikko.koivunalho@iki.fi">Mikko Koivunalho</author>
+    </properties>
+    <body>
+        <release version="0.0.10" date="FUTURE DATE" description="Subsequent patch release while moving towards version 1.0.0">
+            <action dev="mikkoi" type="update" date="2025-09-15">
+                Add changes file.
+            </action>
+        </release>
+        <release version="0.0.9" date="2025-09-15" description="Subsequent patch release while moving towards version 1.0.0">
+        </release>
+    </body>
+</document>
