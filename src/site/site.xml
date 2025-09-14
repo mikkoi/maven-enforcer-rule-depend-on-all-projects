@@ -24,11 +24,6 @@
     </custom>
 
     <body>
-        <head><![CDATA[
-            <!-- because the structure is not flat we must use absolute urls -->
-            <link rel="stylesheet" href="site.css" type="text/css" />
-        ]]></head>
-
         <menu name="Maven Enforcer Rule dependOnAllProjects">
             <item name="About" href="index.html"/>
             <item name="Quickstart" href="quickstart.html"/>
@@ -36,5 +31,7 @@
         </menu>
 
         <menu ref="reports"/>
+        <footer><![CDATA[<p>Copyright &#169; 2025 <a href="http://www.linkedin.com/in/mikkokoivunalho/">Private</a></p>]]></footer>
+
     </body>
 </site>
