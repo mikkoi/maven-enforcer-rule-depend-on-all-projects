@@ -1,0 +1,80 @@
+Quickstart Guide
+================
+
+Configuring the plugin
+----------------------
+
+Add the following in the `<plugins>` list of your project's `pom.xml` file:
+
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <dependencies>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>${project.artifactId}</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+        <executions>
+            <execution>
+                <id>depend-on-all-projects</id>
+                <phase>validate</phase>
+                <goals>
+                    <goal>enforce</goal>
+                </goals>
+                <configuration>
+                    <rules>
+                        <dependOnAllProjects/>
+                    </rules>
+                </configuration>
+            </execution>
+        </executions>
+    </plugin>
+
+Another configuration example with separate `<pluginManagement>` definition:
+
+    <project>
+        <build>
+            <pluginManagement>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <version>3.6.1</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>com.github.mikkoi</groupId>
+                                <artifactId>maven-enforcer-rule-depend-on-all-projects</artifactId>
+                                <version>@project.version@</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                </plugins>
+            </pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <configuration>
+                        <rules>
+                            <dependOnAllProjects>
+                                <!-- Include all projects with same groupId -->
+                                <!-- except pom projects and one web application -->
+                                <includes>
+                                    <include>com.github.mikkoi:*</include>
+                                </includes>
+                                <excludes>
+                                    <exclude>com.github.mikkoi:*:pom</exclude>
+                                    <exclude>com.github.mikkoi:not-me:war</exclude>
+                                </excludes>
+                            </dependOnAllProjects>
+                        </rules>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
+
+    </project>
+
+To know more about plugin's configuration and parameters check the [mojo page](usage.html).

@@ -1,3 +1,8 @@
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+![Maven]((https://img.shields.io/badge/apachemaven-C71A36.svg?style=for-the-badge&logo=apachemaven&logoColor=white))
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.mikkoi/maven-enforcer-rule-depend-on-all-projects.svg)](https://mvnrepository.com/artifact/com.github.mikkoi/maven-enforcer-rule-depend-on-all-projects)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=mikkoi_maven-enforcer-rule-depend-on-all-projects&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=mikkoi_maven-enforcer-rule-depend-on-all-projects)
+
 # Maven Enforcer Plugin Rule dependOnAllProjects
 
 # Introduction

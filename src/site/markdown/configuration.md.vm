@@ -1,0 +1,27 @@
+Configuration
+=============
+
+Enforcer rule `${project.artifactId}` has the following configuration parameters:
+
+* `<includes>`
+
+Include these projects. Default: include every project.
+
+Example:
+
+    <includes>
+        <include>project-subroot-*</include>
+        <include>${project.groupId}:project-thing:war</include>
+    </includes>
+
+* `<excludes>`
+
+Exclude these projects. If both `<includes>` and `<excludes>` are defined,
+then `<includes>` are used to filter in, and then `<excludes>` are excluded from
+those already picked.
+
+    <excludes>
+        <exclude>project-excluded</exclude>
+        <exclude>${project.groupId}:project-subroot-*</exclude>
+        <exclude>${project.groupId}:project-thing:war</exclude>
+    </excludes>

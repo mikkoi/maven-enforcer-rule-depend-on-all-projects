@@ -1,0 +1,47 @@
+Maven Enforcer Rule dependOnAllProjects
+=======================================
+
+[Maven Enforcer Plugin](http://maven.apache.org/enforcer/maven-enforcer-plugin/)
+provides [rules](https://maven.apache.org/enforcer/enforcer-rules/index.html)
+to control environmental and configurational constraints such as Maven version,
+JDK version, OS family, existence or non-existence of files and Maven profiles or properties.
+The are also many [custom rules](https://maven.apache.org/enforcer/maven-enforcer-plugin/thirdparty-rules.html)
+created by users or third parties.
+
+${project.name}, `${project.groupId}:${project.artifactId}`
+is a user created [custom rule](http://maven.apache.org/enforcer/enforcer-api/writing-a-custom-rule.html)
+to force any Maven project in a multimodule build to have a dependency on all other projects in the same build.
+
+Use Cases
+---------
+
+There is one general use case for this functionality and also one very specific use case.
+The rule ensures that when a multimodule Maven project is reconfigured with adding or removing subprojects,
+all projects are listed as dependencies for the subproject where
+`maven-enforcer-plugin` is executed. If used in a CI pipeline or in any similar manner,
+this Maven Enforcer rule will keep the subproject up-to-date.
+
+General Use Case
+----------------
+
+If there is something that needs to be done after everything else in the build is completed,
+it can be placed into its own subproject with `maven-enforcer-plugin` configured with this rule.
+
+Jacoco Use Case
+---------------
+
+[Jacoco](https://www.jacoco.org/jacoco/) is a free Java code coverage library.
+When used in a multimodule project, after building and running tests for all those
+subproject which contain source code, the build must execute
+[jacoco:report-aggregate](https://www.jacoco.org/jacoco/trunk/doc/report-aggregate-mojo.html).
+
+This creates a structured code coverage report (HTML, XML, and CSV) from multiple projects within
+[Maven reactor](https://maven.apache.org/guides/mini/guide-multiple-modules.html).
+The report is created from all modules that the project depends on, and optionally that subproject itself.
+From those projects class and source files as well as JaCoCo execution data files will be collected.
+In addition execution data is collected from the project itself.
+This also allows to create coverage reports when tests are in separate projects than the code under test,
+for example in case of integration tests.
+
+With ${project.name} the subproject can ensure that all other subprojects are indeed
+listed as its dependencies, or exceptions are configured properly.
