@@ -58,6 +58,7 @@ jobs:
         run: |
           git config --global core.autocrlf false
           git config --global core.safecrlf false
+          git config --global url.https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/.insteadOf https://github.com/
       - id: release-prepare
         name: Create And Commit Release Commits
         # Leave behind the release.properties file
@@ -70,5 +71,4 @@ jobs:
           mvn --batch-mode                                                     \
             --activate-profiles publish                                        \
             --define goals='deploy,site,site:stage,scm-publish:publish-scm'    \
-            --define arguments'-DskipTests -Dpmd.skip -Dspotbugs.skip'         \
             release:perform
