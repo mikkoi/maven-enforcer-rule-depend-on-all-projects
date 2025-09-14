@@ -4,7 +4,7 @@
 
     <groupId>com.github.mikkoi</groupId>
     <artifactId>maven-enforcer-rule-depend-on-all-projects</artifactId>
-    <version>0.0.7-SNAPSHOT</version>
+    <version>0.0.7</version>
     <packaging>jar</packaging>
     <name>Maven Enforcer Rule dependOnAllProjects</name>
     <description>Custom rule for Maven Enforcer to require all other subprojects of the build are defined as dependencies.</description>
@@ -23,7 +23,7 @@
     <scm>
         <connection>scm:git:${project.scm.url}</connection>
         <developerConnection>scm:git:${project.scm.url}</developerConnection>
-        <tag>HEAD</tag>
+        <tag>maven-enforcer-rule-depend-on-all-projects-0.0.7</tag>
         <url>https://github.com/mikkoi/maven-enforcer-rule-depend-on-all-projects.git</url>
     </scm>
 
