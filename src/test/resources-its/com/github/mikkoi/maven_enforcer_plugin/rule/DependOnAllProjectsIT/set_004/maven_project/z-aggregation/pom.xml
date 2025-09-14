@@ -17,6 +17,11 @@
     <dependencies>
         <dependency>
             <groupId>com.github.mikkoi</groupId>
+            <artifactId>maven-enforcer-rule-depend-on-all-projects-set-004</artifactId>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>com.github.mikkoi</groupId>
             <artifactId>other</artifactId>
             <type>pom</type>
         </dependency>
@@ -51,7 +56,9 @@
                 <artifactId>maven-enforcer-plugin</artifactId>
                 <configuration>
                     <rules>
-                        <dependOnAllProjects />
+                        <dependOnAllProjects>
+                            <includeRootProject/>
+                        </dependOnAllProjects>
                     </rules>
                 </configuration>
             </plugin>

@@ -7,6 +7,9 @@
     </properties>
     <body>
         <release version="0.0.10" date="FUTURE DATE" description="Subsequent patch release while moving towards version 1.0.0">
+            <action dev="mikkoi" type="add">
+                Document parameter `includeRootProject` and add a test case (use existing).
+            </action>
             <action dev="mikkoi" type="update" date="2025-09-15">
                 Add changes file.
             </action>

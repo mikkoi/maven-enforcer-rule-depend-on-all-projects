@@ -45,13 +45,13 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
      * Error if unknown project in includes/excludes.
      * If a wildcard (*) is used in the name, this parameter has no effect.
      */
-    @SuppressWarnings("unused")
+    @SuppressWarnings("unused") // Not actually unused. Set via Plexus/Sisu Container.
     private boolean errorIfUnknownProject;
 
     /**
      * Include Maven root project
      */
-    @SuppressWarnings("unused")
+    @SuppressWarnings("unused") // Not actually unused. Set via Plexus/Sisu Container.
     private boolean includeRootProject;
 
     // Inject needed Maven components
@@ -234,7 +234,10 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
      */
     @Override
     public String toString() {
-        return String.format("DependOnAllProjects[includes=%s;excludes=%s;errorIfUnknownProject=%b]", includes, excludes, errorIfUnknownProject);
+        return String.format(
+                "DependOnAllProjects[includes=%s;excludes=%s;includeRootProject=%b;errorIfUnknownProject=%b]",
+                includes, excludes, includeRootProject, errorIfUnknownProject
+        );
     }
 
     private boolean isIncluded(MavenProject mavenProject) {

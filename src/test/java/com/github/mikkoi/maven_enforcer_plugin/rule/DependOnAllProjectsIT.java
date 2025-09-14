@@ -78,6 +78,24 @@ public class DependOnAllProjectsIT {
 
     }
 
+    @Nested
+    @MavenProject      // Use same Maven project for all tests in this set.
+    @MavenGoal("validate")
+    @MavenOption(MavenCLIOptions.BATCH_MODE)
+    @MavenOption(MavenCLIOptions.QUIET)
+    //@MavenOption(MavenCLIOptions.VERBOSE)
+    @MavenRepository   // We can share the local repository because this plugin does not use it.
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    class set_004 {
+
+        @MavenTest
+        @Order(1)
+        void the_first_test_case(MavenExecutionResult result) {
+            assertThat(result).isSuccessful();
+        }
+
+    }
+
     private Dependency getRootProjectAsDependency(MavenExecutionResult result) {
         final Dependency rootProject = new Dependency();
         rootProject.setType(result.getMavenProjectResult().getModel().getPackaging());

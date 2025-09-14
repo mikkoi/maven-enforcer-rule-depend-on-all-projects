@@ -34,6 +34,13 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Note, we add the current project here, too, because we reference it in z-aggregation. -->
+            <dependency>
+                <groupId>com.github.mikkoi</groupId>
+                <artifactId>maven-enforcer-rule-depend-on-all-projects-set-004</artifactId>
+                <version>@project.version@</version>
+                <type>pom</type>
+            </dependency>
             <dependency>
                 <groupId>com.github.mikkoi</groupId>
                 <artifactId>other</artifactId>

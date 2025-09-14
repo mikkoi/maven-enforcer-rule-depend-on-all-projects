@@ -25,3 +25,11 @@ those already picked.
         <exclude>${project.groupId}:project-subroot-*</exclude>
         <exclude>${project.groupId}:project-thing:war</exclude>
     </excludes>
+
+* `<includeRootProject>`
+
+Default: false
+
+Set to true to include the root project in the dependencies.
+
+    <includeRootProject/>
