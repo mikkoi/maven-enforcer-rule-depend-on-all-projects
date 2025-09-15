@@ -8,7 +8,6 @@ import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.rtinfo.RuntimeInformation;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
@@ -29,20 +28,16 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
      */
     private static final String INDENT_DEPENDENCY = "    ";
     /**
-     * Inject needed Maven components.
+     * Inject needed Maven component.
       */
-    @SuppressWarnings("unused")
-    private final MavenProject mavenProject;
     private final MavenSession mavenSession;
-    @SuppressWarnings("unused")
-    private final RuntimeInformation runtimeInformation;
     /**
      * Exclude by project [groupId:]artifactId[:packagingType].
      * Default value: No projects excluded.
      * If includes list contains any items, they are evaluated first.
      * Then excludes are excluded from them.
      */
-    List<String> excludes;
+    private List<String> excludes;
     /**
      * Include by project [groupId:]artifactId[:packagingType].
      * Default value: all projects included.
@@ -55,23 +50,28 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
     @SuppressWarnings("unused") // Not actually unused. Set via Plexus/Sisu Container.
     private boolean errorIfUnknownProject;
     /**
-     * Include Maven root project
+     * Include Maven root project.
      */
     @SuppressWarnings("unused") // Not actually unused. Set via Plexus/Sisu Container.
     private boolean includeRootProject;
 
+    /**
+     * Constructor.
+     *
+     * @param session            Initialized MavenSession object.
+     */
     @Inject
     @SuppressFBWarnings
-    public DependOnAllProjects(MavenProject project, MavenSession session,
-                               RuntimeInformation runtimeInformation) {
-        this.mavenProject = Objects.requireNonNull(project);
+    public DependOnAllProjects(MavenSession session) {
         this.mavenSession = Objects.requireNonNull(session);
-        this.runtimeInformation = Objects.requireNonNull(runtimeInformation);
     }
 
     /**
-     * Format a dependency definition
+     * Format Dependency object to XML snippet.
      * User can simply copy-paste this to the project.
+     * @param dependency Dependency object
+     * @param indent     Indentation string, e.g. "    "
+     * @return Formatted XML snippet
      */
     public static String formatDependency(Dependency dependency, String indent) {
         final String newLine = System.lineSeparator();
@@ -118,9 +118,9 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
      * @return true if projects are equal
      */
     public static boolean projectsAreEquals(MavenProject a, MavenProject b) {
-        return a.getGroupId().equals(b.getGroupId()) &&
-            a.getArtifactId().equals(b.getArtifactId()) && a.getVersion().equals(b.getVersion()) &&
-            a.getPackaging().equals(b.getPackaging());
+        return a.getGroupId().equals(b.getGroupId())
+            && a.getArtifactId().equals(b.getArtifactId()) && a.getVersion().equals(b.getVersion())
+            && a.getPackaging().equals(b.getPackaging());
     }
 
     /**
@@ -132,9 +132,9 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
      * @return true if dependencies are equal
      */
     public static boolean dependenciesAreEquals(Dependency a, Dependency b) {
-        return a.getGroupId().equals(b.getGroupId()) &&
-            a.getArtifactId().equals(b.getArtifactId()) && a.getVersion().equals(b.getVersion()) &&
-            a.getType().equals(b.getType());
+        return a.getGroupId().equals(b.getGroupId())
+            && a.getArtifactId().equals(b.getArtifactId()) && a.getVersion().equals(b.getVersion())
+            && a.getType().equals(b.getType());
     }
 
     /**
@@ -170,15 +170,15 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
                     return true;
                 }
             } else if (ids.size() == 2) {
-                if (project.getGroupId().equals(ids.get(0)) &&
-                    project.getArtifactId().equals(ids.get(1))) {
+                if (project.getGroupId().equals(ids.get(0))
+                    && project.getArtifactId().equals(ids.get(1))) {
                     return true;
                 }
             } else {
                 assert ids.size() == 3;
-                if (project.getGroupId().equals(ids.get(0)) &&
-                    project.getArtifactId().equals(ids.get(1)) &&
-                    project.getPackaging().equals(ids.get(2))) {
+                if (project.getGroupId().equals(ids.get(0))
+                    && project.getArtifactId().equals(ids.get(1))
+                    && project.getPackaging().equals(ids.get(2))) {
                     return true;
                 }
             }
@@ -219,13 +219,15 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
         // Match from the end of the id, artifactId alone is enough.
         Predicate<String> predicateForProjectId =
             s -> projectId.matches(convertStringForMatching(s));
-        return includes.stream().anyMatch(predicateForProjectId) &&
-            excludes.stream().noneMatch(predicateForProjectId);
+        return includes.stream().anyMatch(predicateForProjectId)
+            && excludes.stream().noneMatch(predicateForProjectId);
     }
 
     /**
      * Validate parameters provided via properties
      * either on the command line or using configuration element in pom.
+     *
+     * @throws EnforcerRuleException if parameter validation fails.
      */
     private void validateAndPrepareParameters() throws EnforcerRuleException {
         getLog().debug("includes=" + includes);
@@ -254,8 +256,8 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
                 throw new EnforcerRuleException(
                     "Failure in parameter 'includes'. String is invalid");
             }
-            if (errorIfUnknownProject && !a.contains("*") &&
-                !projectsContains(reactorProjects, a)) {
+            if (errorIfUnknownProject && !a.contains("*")
+                && !projectsContains(reactorProjects, a)) {
                 throw new EnforcerRuleException(String.format(
                     "Failure in parameter 'excludes'. Project '%s' not found in build", a));
             }
@@ -275,8 +277,8 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
                 throw new EnforcerRuleException(
                     "Failure in parameter 'excludes'. String is invalid");
             }
-            if (errorIfUnknownProject && !a.contains("*") &&
-                !projectsContains(reactorProjects, a)) {
+            if (errorIfUnknownProject && !a.contains("*")
+                && !projectsContains(reactorProjects, a)) {
                 throw new EnforcerRuleException(String.format(
                     "Failure in parameter 'excludes'. Project '%s' not found in build", a));
             }
@@ -289,14 +291,16 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
     }
 
     /**
-     * The rule logic
+     * The rule logic.
      * Collect all projects in the build and filter according to includes/excludes.
      * Match the list with the dependencies of the current project.
      * If the two lists do not match, Raise EnforcerRuleException
+     *
+     * @throws EnforcerRuleException if rule fails.
      */
-    public void dependOnAllProjects(MavenSession mavenSession) throws EnforcerRuleException {
+    public void dependOnAllProjects() throws EnforcerRuleException {
         List<MavenProject> includedProjects = new ArrayList<>();
-        MavenProject currentProject = this.mavenSession.getCurrentProject();
+        MavenProject currentProject = mavenSession.getCurrentProject();
         getLog().debug(String.format("Current Project: %s:%s", currentProject.getGroupId(),
             currentProject.getArtifactId()));
 
@@ -308,10 +312,10 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
             getLog().debug("    " + projectId);
 
             if (isIncluded(project)) {
-                if (projectsAreEquals(project, currentProject) || (!this.includeRootProject &&
-                    projectsAreEquals(project, mavenSession.getTopLevelProject()))) {
-                    getLog().debug("Filter out project: " +
-                        String.format("%s:%s", project.getGroupId(), project.getArtifactId()));
+                if (projectsAreEquals(project, currentProject) || (!this.includeRootProject
+                    && projectsAreEquals(project, mavenSession.getTopLevelProject()))) {
+                    getLog().debug("Filter out project: "
+                        + String.format("%s:%s", project.getGroupId(), project.getArtifactId()));
                 } else {
                     includedProjects.add(project);
                 }
@@ -353,24 +357,25 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
 
     /**
      * The main entry point for rule.
+     *
+     * @throws EnforcerRuleException if rule fails.
      */
     @Override
     public void execute() throws EnforcerRuleException {
-        MavenProject currentProject = this.mavenSession.getCurrentProject();
+        MavenProject currentProject = mavenSession.getCurrentProject();
         getLog().debug(String.format("Current Project: %s:%s", currentProject.getGroupId(),
             currentProject.getArtifactId()));
-        MavenProject topLevelProject = this.mavenSession.getTopLevelProject();
+        MavenProject topLevelProject = mavenSession.getTopLevelProject();
         getLog().debug(String.format("Top Level Project: %s:%s", topLevelProject.getGroupId(),
             topLevelProject.getArtifactId()));
 
         validateAndPrepareParameters();
 
-        dependOnAllProjects(mavenSession);
+        dependOnAllProjects();
     }
 
     /**
-     * A good practice is provided toString method for Enforcer Rule.
-     * <p>
+     * String representation of the rule.
      * Output is used in verbose Maven logs, can help during investigate problems.
      *
      * @return rule description

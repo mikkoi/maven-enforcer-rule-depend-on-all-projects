@@ -52,8 +52,7 @@ public class DependOnAllProjectsIT {
             assertThat(result).isFailure().out().error()
                     .contains("Rule 0: com.github.mikkoi.maven_enforcer_plugin.rule.DependOnAllProjects failed with message:")
                     .contains(String.format("Project '%s:%s' is missing dependency '%s:%s:%s'.", groupId, "z-aggregation", groupId, "subproject", "jar"))
-                    .contains(String.format("Project '%s:%s' is missing dependency '%s:%s:%s'.", groupId, "z-aggregation", groupId, "other-second-fourth", "jar"))
-            ;
+                    .contains(String.format("Project '%s:%s' is missing dependency '%s:%s:%s'.", groupId, "z-aggregation", groupId, "other-second-fourth", "jar"));
         }
 
     }
