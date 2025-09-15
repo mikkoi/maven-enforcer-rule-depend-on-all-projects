@@ -7,6 +7,9 @@
     </properties>
     <body>
         <release version="0.0.14" date="2030-12-31" description="Subsequent patch release while moving towards version 1.0.0">
+            <action dev="mikkoi" type="update" date="2025-09-15">
+                Remove method which implements an exact copy of its superclass' method.
+            </action>
         </release>
         <release version="0.0.13" date="2025-09-15" description="Subsequent patch release while moving towards version 1.0.0">
         </release>

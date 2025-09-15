@@ -369,16 +369,6 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
     }
 
     /**
-     * Rule is not cacheable.
-     *
-     * @return null (no caching)
-     */
-    @Override
-    public String getCacheId() {
-        return null;
-    }
-
-    /**
      * A good practice is provided toString method for Enforcer Rule.
      * <p>
      * Output is used in verbose Maven logs, can help during investigate problems.
