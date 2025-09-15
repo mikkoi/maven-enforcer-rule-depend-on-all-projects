@@ -8,4 +8,5 @@
     <!-- suppress certain checks on all files -->
     <suppress files="." checks="LineLengthCheck"/>
     <suppress files="." checks="AvoidInlineConditionals"/>
+    <suppress files="." checks="FinalParameters"/>
 </suppressions>
