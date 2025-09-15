@@ -25,7 +25,7 @@ jobs:
         with:
           fetch-depth: 0
           fetch-tags: true
-          ifs: true
+          lfs: true
       - id: setup-java
         name: Setup Java
         uses: actions/setup-java@v5
