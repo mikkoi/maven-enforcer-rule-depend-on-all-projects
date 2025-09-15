@@ -47,6 +47,8 @@ jobs:
         name: Prepare Git User
         shell: bash
         run: |
+          set -x
+          gpg --list-secret-keys
           git config --global user.name 'Developer - Mikko Koivunalho'
           git config --global user.email 'mikkoi@dev.email.kapsi.fi'
           git config --global user.signingkey "${GPG_SIGNING_KEY_ID}"
