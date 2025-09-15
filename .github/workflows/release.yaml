@@ -48,12 +48,13 @@ jobs:
         shell: bash
         run: |
           set -x
+          GPG_TTY="$(tty)" && export GPG_TTY
+          env
           echo -e "5\ny\n" | gpg --command-fd 0 --edit-key "${GPG_SIGNING_KEY_ID}" trust
           gpg --list-secret-keys
           git config --global user.name 'Developer - Mikko Koivunalho'
           git config --global user.email 'mikkoi@dev.email.kapsi.fi'
           git config --global user.signingkey "${GPG_SIGNING_KEY_ID}"
-          GPG_TTY="$(tty)" && export GPG_TTY
       - id: amend-git-config
         name: Amend Git Config
         shell: bash
