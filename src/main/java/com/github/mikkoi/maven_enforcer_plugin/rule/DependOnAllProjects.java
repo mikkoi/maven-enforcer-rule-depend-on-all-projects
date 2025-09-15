@@ -18,7 +18,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
- * Maven Enforcer Custom Rule
+ * Maven Enforcer Custom Rule.
  */
 @Named("dependOnAllProjects")
 public class DependOnAllProjects extends AbstractEnforcerRule {
@@ -28,7 +28,9 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
      * Size of indentation inside a &lt;dependency>&gt; definition.
      */
     private static final String INDENT_DEPENDENCY = "    ";
-    // Inject needed Maven components
+    /**
+     * Inject needed Maven components.
+      */
     @SuppressWarnings("unused")
     private final MavenProject mavenProject;
     private final MavenSession mavenSession;
@@ -108,7 +110,12 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
     }
 
     /**
-     * Compare groupId, artifactId, version and packagingType.
+     * Compare two MavenProject objects.
+     * GroupId, ArtifactId, Version and Packaging must match.
+     *
+     * @param a MavenProject a
+     * @param b MavenProject b
+     * @return true if projects are equal
      */
     public static boolean projectsAreEquals(MavenProject a, MavenProject b) {
         return a.getGroupId().equals(b.getGroupId()) &&
@@ -116,6 +123,14 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
             a.getPackaging().equals(b.getPackaging());
     }
 
+    /**
+     * Compare two Dependency objects.
+     * GroupId, ArtifactId, Version and Type must match.
+     *
+     * @param a Dependency a
+     * @param b Dependency b
+     * @return true if dependencies are equal
+     */
     public static boolean dependenciesAreEquals(Dependency a, Dependency b) {
         return a.getGroupId().equals(b.getGroupId()) &&
             a.getArtifactId().equals(b.getArtifactId()) && a.getVersion().equals(b.getVersion()) &&
@@ -171,6 +186,12 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
         return false;
     }
 
+    /**
+     * Convert MavenProject to Dependency object.
+     *
+     * @param mavenProject MavenProject object
+     * @return Dependency object
+     */
     public static Dependency projectToDependency(MavenProject mavenProject) {
         Dependency d = new Dependency();
         d.setGroupId(mavenProject.getGroupId());
@@ -300,7 +321,7 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
         List<MavenProject> missingProjects = new ArrayList<>();
         for (MavenProject project : includedProjects) {
             @SuppressWarnings("unchecked") List<Dependency> dependencies =
-                (List<Dependency>) currentProject.getDependencies();
+                currentProject.getDependencies();
             if (!dependenciesContains(dependencies, project)) {
                 missingProjects.add(project);
             }
@@ -348,22 +369,13 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
     }
 
     /**
-     * If your rule is cacheable, you must return a unique id when parameters or conditions
-     * change that would cause the result to be different. Multiple cached results are stored
-     * based on their id.
-     * <p>
-     * The easiest way to do this is to return a hash computed from the values of your parameters.
-     * <p>
-     * If your rule is not cacheable, then you don't need to override this method or return null
+     * Rule is not cacheable.
+     *
+     * @return null (no caching)
      */
     @Override
     public String getCacheId() {
-        //no hash on boolean...only parameter so no hash is needed.
-//        return Boolean.toString(shouldIFail);
-
-        // TODO
-        // Parameters + current project dependencies + all maven projects in the build
-        return "1";
+        return null;
     }
 
     /**
