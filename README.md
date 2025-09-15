@@ -21,11 +21,41 @@ This custom rule will emit an error and break build (unless suppressed)
 if all other subprojects of the build are not defined as dependencies
 to this subproject.
 
-You can also define exceptions to this rule with the following parameters:
+Example usage:
 
-* includes
-* excludes
-* includeRoot
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <dependencies>
+            <dependency>
+                <groupId>com.github.mikkoi</groupId>
+                <artifactId>maven-enforcer-rule-depend-on-all-projects</artifactId>
+            </dependency>
+        </dependencies>
+        <executions>
+            <execution>
+                <id>depend-on-all-projects</id>
+                <phase>validate</phase>
+                <goals>
+                    <goal>enforce</goal>
+                </goals>
+                <configuration>
+                    <rules>
+                        <dependOnAllProjects>
+                            <includes>
+                                <include>main-*</include>
+                            </includes>
+                            <excludes>
+                                <exclude>main-project-excluded</exclude>
+                                <exclude>main-project-excluded-*</exclude>
+                            </excludes>
+                        </dependOnAllProjects>
+                    </rules>
+                </configuration>
+            </execution>
+        </executions>
+    </plugin>
+
 
 ## License
 
