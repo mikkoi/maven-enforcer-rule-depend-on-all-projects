@@ -30,7 +30,7 @@ public class DependOnAllProjectsIT {
 
         @MavenTest
         @Order(1)
-        void the_first_test_case(MavenExecutionResult result) {
+        void theFirstTestCase(MavenExecutionResult result) {
             assertThat(result).isSuccessful();
         }
     }
@@ -47,7 +47,7 @@ public class DependOnAllProjectsIT {
 
         @MavenTest
         @Order(1)
-        void the_first_test_case(MavenExecutionResult result) {
+        void theFirstTestCase(MavenExecutionResult result) {
             final String groupId = result.getMavenProjectResult().getModel().getGroupId();
             assertThat(result).isFailure().out().error()
                     .contains("Rule 0: com.github.mikkoi.maven_enforcer_plugin.rule.DependOnAllProjects failed with message:")
@@ -70,7 +70,7 @@ public class DependOnAllProjectsIT {
 
         @MavenTest
         @Order(1)
-        void the_first_test_case(MavenExecutionResult result) {
+        void theFirstTestCase(MavenExecutionResult result) {
             assertThat(result).isSuccessful();
         }
 
@@ -88,7 +88,7 @@ public class DependOnAllProjectsIT {
 
         @MavenTest
         @Order(1)
-        void the_first_test_case(MavenExecutionResult result) {
+        void theFirstTestCase(MavenExecutionResult result) {
             assertThat(result).isSuccessful();
         }
 
@@ -106,7 +106,7 @@ public class DependOnAllProjectsIT {
 
         @MavenTest
         @Order(1)
-        void the_first_test_case(MavenExecutionResult result) {
+        void theFirstTestCase(MavenExecutionResult result) {
             assertThat(result).isFailure().out().error().contains("Failure in parameter 'excludes'. Project 'com.github.mikkoi:non-existing-project' not found in build");
         }
 
@@ -124,7 +124,7 @@ public class DependOnAllProjectsIT {
 
         @MavenTest
         @Order(1)
-        void the_first_test_case(MavenExecutionResult result) {
+        void theFirstTestCase(MavenExecutionResult result) {
             assertThat(result).isSuccessful();
         }
 
