@@ -33,7 +33,7 @@
           <ul class="breadcrumb">
         <li id="publishDate">$i18n.getString( "site-renderer", $locale, "template.lastpublished" ): $dateValue<span class="divider">|</span>
 </li>
-          <li id="projectVersion">$i18n.getString( "site-renderer", $locale, "template.version" ): 0.0.10</li>
+          <li id="projectVersion">$i18n.getString( "site-renderer", $locale, "template.version" ): 0.0.13</li>
           </ul>
         </div>
       </header>
@@ -87,7 +87,7 @@
 <th>Missing Classes</th></tr>
 <tr class="b">
 <td>2</td>
-<td>1</td>
+<td>2</td>
 <td>0</td>
 <td>2</td></tr></table></section><section>
 <h1>Files</h1>
@@ -97,7 +97,7 @@
 <th>Bugs</th></tr>
 <tr class="b">
 <td><a href="#com.github.mikkoi.maven_enforcer_plugin.rule.DependOnAllProjects">com.github.mikkoi.maven_enforcer_plugin.rule.DependOnAllProjects</a></td>
-<td>1</td></tr></table></section><a name="com.github.mikkoi.maven_enforcer_plugin.rule.DependOnAllProjects"></a><section>
+<td>2</td></tr></table></section><a name="com.github.mikkoi.maven_enforcer_plugin.rule.DependOnAllProjects"></a><section>
 <h2>com.github.mikkoi.maven_enforcer_plugin.rule.DependOnAllProjects</h2>
 <table class="table table-striped">
 <tr class="a">
@@ -107,10 +107,16 @@
 <th>Line</th>
 <th>Priority</th></tr>
 <tr class="b">
+<td>Method com.github.mikkoi.maven_enforcer_plugin.rule.DependOnAllProjects.getCacheId() is implemented with an exact copy of its superclass' method</td>
+<td>STYLE</td>
+<td><a class="externalLink" href="https://spotbugs.readthedocs.io/en/latest/bugDescriptions.html#COM_COPIED_OVERRIDDEN_METHOD">COM_COPIED_OVERRIDDEN_METHOD</a></td>
+<td><a href="./xref/com/github/mikkoi/maven_enforcer_plugin/rule/DependOnAllProjects.html#L378">378</a></td>
+<td>Medium</td></tr>
+<tr class="a">
 <td>java/lang/StringBuilder.append(Ljava/lang/String;)Ljava/lang/StringBuilder; is potentially injected into an XML string in method com.github.mikkoi.maven_enforcer_plugin.rule.DependOnAllProjects.dependOnAllProjects(MavenSession).</td>
 <td>SECURITY</td>
 <td><a class="externalLink" href="https://spotbugs.readthedocs.io/en/latest/bugDescriptions.html#POTENTIAL_XML_INJECTION">POTENTIAL_XML_INJECTION</a></td>
-<td><a href="./xref/com/github/mikkoi/maven_enforcer_plugin/rule/DependOnAllProjects.html#L323">323</a></td>
+<td><a href="./xref/com/github/mikkoi/maven_enforcer_plugin/rule/DependOnAllProjects.html#L344">344</a></td>
 <td>Medium</td></tr></table></section>
         </main>
       </div>
