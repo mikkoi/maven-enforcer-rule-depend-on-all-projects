@@ -597,7 +597,7 @@
                             <includeTestSourceDirectory>true</includeTestSourceDirectory>
                             <violationSeverity>error</violationSeverity>
                             <failsOnError>false</failsOnError>
-                            <suppressionsLocation>${project.basedir}/checkstyle-suppressions.xml</suppressionsLocation>
+                            <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>
                         </configuration>
                     </execution>
                 </executions>
