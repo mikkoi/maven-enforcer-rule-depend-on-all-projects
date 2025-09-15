@@ -33,7 +33,7 @@
           <ul class="breadcrumb">
         <li id="publishDate">$i18n.getString( "site-renderer", $locale, "template.lastpublished" ): $dateValue<span class="divider">|</span>
 </li>
-          <li id="projectVersion">$i18n.getString( "site-renderer", $locale, "template.version" ): 0.0.9</li>
+          <li id="projectVersion">$i18n.getString( "site-renderer", $locale, "template.version" ): 0.0.10</li>
           </ul>
         </div>
       </header>
@@ -89,6 +89,28 @@ those already picked.</p>
     &lt;exclude&gt;com.github.mikkoi:project-subroot-*&lt;/exclude&gt;
     &lt;exclude&gt;com.github.mikkoi:project-thing:war&lt;/exclude&gt;
 &lt;/excludes&gt;
+</code></pre>
+<ul>
+
+<li><code>&lt;includeRootProject&gt;</code></li>
+</ul>
+<p>Default: false</p>
+<p>Set to true to include the root project in the dependencies.</p>
+
+<pre><code class="nohighlight nocode">&lt;includeRootProject&gt;true&lt;/includeRootProject&gt;
+</code></pre>
+<ul>
+
+<li><code>&lt;errorIfUnknownProject&gt;</code></li>
+</ul>
+<p>Default: false</p>
+<p>If there is a full project name (groupId and artifactId) in includes or excludes,
+and that project is not among the
+<a href="https://maven.apache.org/guides/mini/guide-multiple-modules.html" class="externalLink">Maven reactor</a>
+projects, break build with an error.
+This will prevent outdated configuration.</p>
+
+<pre><code class="nohighlight nocode">&lt;errorIfUnknownProject&gt;true&lt;/errorIfUnknownProject&gt;
 </code></pre></section>
         </main>
       </div>
@@ -97,7 +119,7 @@ those already picked.</p>
     <footer>
       <div class="container-fluid">
         <div class="row-fluid">
-<p>Copyright &#169; 2025 <a href="http://www.linkedin.com/in/mikkokoivunalho/">Private</a></p>
+<p>Copyright &#169; 2025 <a href="http://www.linkedin.com/in/mikkokoivunalho/">Mikko Koivunalho</a></p>
         </div>
       </div>
     </footer>
