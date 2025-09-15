@@ -7,7 +7,10 @@
     </properties>
     <body>
         <release version="0.0.10" date="FUTURE DATE" description="Subsequent patch release while moving towards version 1.0.0">
-            <action dev="mikkoi" type="add">
+            <action dev="mikkoi" type="add" date="2025-09-15">
+                Document parameter `errorIfUnknownProject`, implement and add a test case.
+            </action>
+            <action dev="mikkoi" type="add" date="2025-09-15">
                 Document parameter `includeRootProject` and add a test case (use existing).
             </action>
             <action dev="mikkoi" type="update" date="2025-09-15">

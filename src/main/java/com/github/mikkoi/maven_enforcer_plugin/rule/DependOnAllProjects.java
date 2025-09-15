@@ -77,6 +77,10 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
         getLog().debug("includes=" + includes);
         getLog().debug("excludes=" + excludes);
         getLog().debug("errorIfUnknownProject=" + errorIfUnknownProject);
+        getLog().debug("includeRootProject=" + includeRootProject);
+
+        final List<MavenProject> reactorProjects = mavenSession.getProjectDependencyGraph().getSortedProjects();
+        getLog().debug("reactorProjects=" + reactorProjects);
 
         if(includes == null) {
             includes = new ArrayList<>();
@@ -85,8 +89,16 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
             excludes = new ArrayList<>();
         }
         for ( String a : includes ) {
-            if (a == null) {
-                throw new EnforcerRuleException("Failure in parameter 'includes'. String is null");
+            getLog().debug(String.format("Check include '%s'", a));
+            if (a == null || a.isEmpty() || a.matches("^[\t\n ]*$")) {
+                throw new EnforcerRuleException("Failure in parameter 'includes'. String is null, empty or contains only whitespace");
+            }
+            List<String> ids = Arrays.asList(a.split(":"));
+            if (ids.size() > 3) {
+                throw new EnforcerRuleException("Failure in parameter 'includes'. String is invalid");
+            }
+            if(errorIfUnknownProject && !a.contains("*") && !projectsContains(reactorProjects, a)) {
+                throw new EnforcerRuleException(String.format("Failure in parameter 'excludes'. Project '%s' not found in build", a));
             }
         }
         if (includes.isEmpty()) {
@@ -94,18 +106,23 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
         }
 
         for ( String a : excludes ) {
-            if (a == null) {
-                throw new EnforcerRuleException("Failure in parameter 'excludes'. String is null");
+            getLog().debug(String.format("Check exclude '%s'", a));
+            if (a == null || a.isEmpty() || a.matches("^[\t\n ]*$")) {
+                throw new EnforcerRuleException("Failure in parameter 'includes'. String is null, empty or contains only whitespace");
             }
-            // TODO
-            // If the String is a full dependency name without wildcards,
-            // check that the dependency exists among the projects in the build.
-            // If not, throw EnforcerRuleException.
+            List<String> ids = Arrays.asList(a.split(":"));
+            if (ids.size() > 3) {
+                throw new EnforcerRuleException("Failure in parameter 'excludes'. String is invalid");
+            }
+            if(errorIfUnknownProject && !a.contains("*") && !projectsContains(reactorProjects, a)) {
+                throw new EnforcerRuleException(String.format("Failure in parameter 'excludes'. Project '%s' not found in build", a));
+            }
         }
 
         getLog().debug("includes(resolved)=" + includes);
         getLog().debug("excludes(resolved)=" + excludes);
-        getLog().debug("errorIfUnknownProject=" + errorIfUnknownProject);
+        getLog().debug("errorIfUnknownProject(resolved)=" + errorIfUnknownProject);
+        getLog().debug("includeRootProject(resolved)=" + includeRootProject);
     }
 
     /**
@@ -282,10 +299,44 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
                         && a.getType().equals(b.getType());
     }
 
+    /**
+     * Does the list (Iterable) of Dependency objects contain the MavenProject?
+     * @param projects Iterable of Dependency objects
+     * @param project  a Maven project object
+     * @return         true if project is found
+     */
     public static boolean dependenciesContains(Iterable<Dependency> projects, MavenProject project) {
         for(Dependency p : projects) {
             if(dependenciesAreEquals(p, projectToDependency(project))) {
                 return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Does any of the projects in Maven Reactor build match with this project name?
+     * Name must not have a wildcard!
+     * @param projects Iterable of MavenProject objects
+     * @param projectName Project name, e.g. "artifactId", "groupId:artifactId", "groupId:artifactId:packingType".
+     * @return Boolean
+     */
+    public static boolean projectsContains(Iterable<MavenProject> projects, String projectName) {
+        List<String> ids = Arrays.asList(projectName.split(":"));
+        for ( MavenProject project : projects) {
+            if (ids.size() == 1) {
+                if (project.getArtifactId().equals(ids.get(0))) {
+                    return true;
+                }
+            } else if (ids.size() == 2) {
+                if (project.getGroupId().equals(ids.get(0)) && project.getArtifactId().equals(ids.get(1))) {
+                    return true;
+                }
+            } else {
+                assert ids.size() == 3;
+                if (project.getGroupId().equals(ids.get(0)) && project.getArtifactId().equals(ids.get(1)) && project.getPackaging().equals(ids.get(2))) {
+                    return true;
+                }
             }
         }
         return false;

@@ -1,15 +1,42 @@
 package com.github.mikkoi.maven_enforcer_plugin.rule;
 
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DependOnAllProjectsTest {
+
+    @Test
+    public void testProjectsContains() {
+        final List<MavenProject> reactorProjects = new ArrayList<>();
+        for (String s : Arrays.asList(
+                "mikkoi:proj-a:pom",
+                "mikkoi:proj-b:jar",
+                "mikkoi:proj-c:war")) {
+            Model model = new Model();
+            model.setGroupId(Arrays.asList(s.split(":")).get(0));
+            model.setArtifactId(Arrays.asList(s.split(":")).get(1));
+            model.setPackaging(Arrays.asList(s.split(":")).get(2));
+            reactorProjects.add(new MavenProject(model));
+        }
+        assertThat(DependOnAllProjects.projectsContains(reactorProjects, "mikkoi:proj-a:pom")).isTrue();
+        assertThat(DependOnAllProjects.projectsContains(reactorProjects, "mikkoi:proj-a")).isTrue();
+        assertThat(DependOnAllProjects.projectsContains(reactorProjects, "proj-a")).isTrue();
+        assertThat(DependOnAllProjects.projectsContains(reactorProjects, "*")).isFalse();
+        assertThat(DependOnAllProjects.projectsContains(reactorProjects, "mikkoi:*")).isFalse();
+        assertThat(DependOnAllProjects.projectsContains(reactorProjects, "mikkoi:*:pom")).isFalse();
+        assertThat(DependOnAllProjects.projectsContains(reactorProjects, "*:*:pom")).isFalse();
+        assertThat(DependOnAllProjects.projectsContains(reactorProjects, "proj-*")).isFalse();
+        assertThat(DependOnAllProjects.projectsContains(reactorProjects, "proj-d")).isFalse();
+        assertThat(DependOnAllProjects.projectsContains(reactorProjects, "mikkoi:proj-a:war")).isFalse();
+    }
 
     @Test
     public void testIsProjectIncluded() {

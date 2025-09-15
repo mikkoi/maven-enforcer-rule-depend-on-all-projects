@@ -5,7 +5,7 @@
 
     <parent>
         <groupId>com.github.mikkoi</groupId>
-        <artifactId>maven-enforcer-rule-depend-on-all-projects-set-004</artifactId>
+        <artifactId>maven-enforcer-rule-depend-on-all-projects-set-006</artifactId>
         <version>@project.version@</version>
     </parent>
 
@@ -15,39 +15,6 @@
     <description>This project is dependent on all other projects</description>
 
     <dependencies>
-        <dependency>
-            <groupId>com.github.mikkoi</groupId>
-            <artifactId>maven-enforcer-rule-depend-on-all-projects-set-004</artifactId>
-            <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>com.github.mikkoi</groupId>
-            <artifactId>other</artifactId>
-            <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>com.github.mikkoi</groupId>
-            <artifactId>other-second</artifactId>
-            <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>com.github.mikkoi</groupId>
-            <artifactId>other-second-fifth</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.mikkoi</groupId>
-            <artifactId>other-second-fourth</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.mikkoi</groupId>
-            <artifactId>other-second-third</artifactId>
-            <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>com.github.mikkoi</groupId>
-            <artifactId>subproject</artifactId>
-        </dependency>
-
     </dependencies>
     <build>
         <plugins>
@@ -63,7 +30,10 @@
                         <configuration>
                             <rules>
                                 <dependOnAllProjects>
-                                    <includeRootProject/>
+                                    <excludes>
+                                        <exclude>com.github.mikkoi:non-existing-project</exclude>
+                                    </excludes>
+                                    <errorIfUnknownProject>false</errorIfUnknownProject>
                                 </dependOnAllProjects>
                             </rules>
                         </configuration>

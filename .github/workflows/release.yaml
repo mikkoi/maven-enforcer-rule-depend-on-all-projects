@@ -63,7 +63,7 @@ jobs:
         name: Create And Commit Release Commits
         # Leave behind the release.properties file
         run: |
-          mvn -X --batch-mode -DskipTests -Dspotbugs.skip release:prepare
+          mvn -X --batch-mode release:prepare
       - id: release-perform
         name: Publish Jar And Site
         # Deletes the release.properties file if successful release
