@@ -31,6 +31,17 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
           lfs: true
+      - id: import-gpg-key
+        name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_SIGNING_KEY }}
+          passphrase: ${{ secrets.GPG_SIGNING_KEY_PASSWORD }}
+          # Make Git config changes global. Need during site publish to GitHub.
+          git_config_global: true
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+          git_tag_gpgsign: true
       - id: setup-java
         name: Setup Java
         uses: actions/setup-java@v5
@@ -43,18 +54,6 @@ jobs:
           server-password: 'MAVEN_PASSWORD'
           gpg-private-key: ${{ secrets.GPG_SIGNING_KEY }}
           gpg-passphrase: 'MAVEN_GPG_PASSPHRASE'
-      - id: prepare-git-user
-        name: Prepare Git User
-        shell: bash
-        run: |
-          set -x
-          GPG_TTY="$(tty)" && export GPG_TTY
-          env
-          echo -e "5\ny\n" | gpg --command-fd 0 --edit-key "${GPG_SIGNING_KEY_ID}" trust
-          gpg --list-secret-keys
-          git config --global user.name 'Developer - Mikko Koivunalho'
-          git config --global user.email 'mikkoi@dev.email.kapsi.fi'
-          git config --global user.signingkey "${GPG_SIGNING_KEY_ID}"
       - id: amend-git-config
         name: Amend Git Config
         shell: bash
@@ -65,7 +64,6 @@ jobs:
           git config --global core.autocrlf false
           git config --global core.safecrlf false
           git config --global url.https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/.insteadOf https://github.com/
-          git config --global tag.gpgSign true
       - id: release-prepare
         name: Create And Commit Release Commits
         shell: bash
