@@ -6,7 +6,10 @@
         <author email="mikko.koivunalho@iki.fi">Mikko Koivunalho</author>
     </properties>
     <body>
-        <release version="0.0.10" date="FUTURE DATE" description="Subsequent patch release while moving towards version 1.0.0">
+        <release version="0.0.10" date="2030-12-31" description="Subsequent patch release while moving towards version 1.0.0">
+            <action dev="mikkoi" type="add" date="2025-09-15">
+                Configure SonarQube Cloud analysis.
+            </action>
             <action dev="mikkoi" type="add" date="2025-09-15">
                 Document parameter `errorIfUnknownProject`, implement and add a test case.
             </action>

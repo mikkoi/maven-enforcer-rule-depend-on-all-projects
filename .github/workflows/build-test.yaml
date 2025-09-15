@@ -9,9 +9,11 @@
 name: Java CI with Maven
 
 on:
-#  push:
+  push:
 #    branches: [ "main" ]
   pull_request:
+  workflow_dispatch:
+
 
 jobs:
   build:
@@ -20,15 +22,37 @@ jobs:
       - id: checkout-repository
         name: Checkout repository
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          ifs: true
       - id: setup-java
         name: Setup Java
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '17'
           cache: 'maven'
-      - name: Build with Maven
-        run:  mvn --batch-mode --fail-never --file pom.xml verify
+      - id: build
+        name: Build with Maven
+        run: |
+          mvn                                                                  \
+              --batch-mode                                                     \
+              --fail-never                                                     \
+              --file pom.xml                                                   \
+              install                                                          \
+            && true
+      - id: report-to-sonarqube
+        name: Report to SonarQube
+        run: |
+          mvn \
+              --batch-mode                                                     \
+              --fail-never                                                     \
+              -Dsonar.token="${SONAR_TOKEN}"                                   \
+              org.sonarsource.scanner.maven:sonar-maven-plugin:sonar           \
+          && true
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
       #- name: Update dependency graph

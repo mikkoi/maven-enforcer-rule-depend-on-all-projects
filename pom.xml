@@ -85,7 +85,7 @@
         <maven-plugin-tools.version>3.15.1</maven-plugin-tools.version>
         <maven.version>3.9.10</maven.version>
         <maven-project.version>2.2.1</maven-project.version>
-        <error-prone.version>2.38.0</error-prone.version>
+        <error-prone.version>2.41.0</error-prone.version>
 
         <!-- Dependencies (Non-Maven) -->
         <org.junit.jupiter.version>5.12.1</org.junit.jupiter.version>
@@ -101,6 +101,13 @@
         <spotbugs.version>4.9.3.0</spotbugs.version>
         <spotbugs.plugin.fb-contrib.version>7.6.10</spotbugs.plugin.fb-contrib.version>
         <spotbugs.plugin.find-sec-bugs.version>1.13.0</spotbugs.plugin.find-sec-bugs.version>
+
+        <!-- Sonar -->
+        <sonar.token>REPLACE_ME</sonar.token>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.organization>mikkoi</sonar.organization>
+        <sonar.projectKey>mikkoi_maven-enforcer-rule-depend-on-all-projects</sonar.projectKey>
+
     </properties>
 
     <dependencyManagement>
@@ -452,6 +459,13 @@
                     <artifactId>sisu-maven-plugin</artifactId>
                     <version>${sisu.version}</version>
                 </plugin>
+
+                <plugin>
+                    <groupId>org.sonarsource.scanner.maven</groupId>
+                    <artifactId>sonar-maven-plugin</artifactId>
+                    <version>5.2.0.4988</version>
+                </plugin>
+
             </plugins>
         </pluginManagement>
 
@@ -469,8 +483,7 @@
                     <compilerArgs>
                         <arg>-XDcompilePolicy=simple</arg>
                         <arg>--should-stop=ifError=FLOW</arg>
-                        <!-- <arg>-Xplugin:ErrorProne</arg>-->
-                        <!-- <arg>-verbose</arg> -->
+                        <arg>-verbose</arg>
                         <!-- https://docs.oracle.com/javase/8/docs/technotes/tools/windows/javac.html -->
                         <!-- Enables all recommended warnings. In this release [Java 8], enabling all available warnings is recommended. -->
                         <arg>-Xlint:all</arg>
@@ -619,6 +632,30 @@
                             <goal>changes-check</goal>
                         </goals>
                         <phase>validate</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <formats>
+                                <format>XML</format>
+                            </formats>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
