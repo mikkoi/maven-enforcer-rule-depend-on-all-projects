@@ -11,10 +11,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class DependOnAllProjectsTest {
+class DependOnAllProjectsTest {
 
     @Test
-    public void testProjectsContains() {
+    void testProjectsContains() {
         final List<MavenProject> reactorProjects = new ArrayList<>();
         for (String s : Arrays.asList(
                 "mikkoi:proj-a:pom",
@@ -39,7 +39,7 @@ public class DependOnAllProjectsTest {
     }
 
     @Test
-    public void testIsProjectIncluded() {
+    void testIsProjectIncluded() {
         final MavenProject project = new MavenProject();
 
         List<String> includes = new ArrayList<>();
@@ -77,7 +77,7 @@ public class DependOnAllProjectsTest {
     }
 
     @Test
-    public void testConvertStringForMatching() {
+    void testConvertStringForMatching() {
         String name1 = DependOnAllProjects.convertStringForMatching("apache");
         assertThat(name1).isEqualTo(".*:apache:.*");
 
@@ -96,7 +96,7 @@ public class DependOnAllProjectsTest {
     }
 
     @Test
-    public void testFormatDependency() {
+    void testFormatDependency() {
         Dependency d1 = new Dependency();
         d1.setGroupId("com.github.mikkoi");
         d1.setArtifactId("test-dependency");

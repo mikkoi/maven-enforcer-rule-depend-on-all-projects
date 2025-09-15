@@ -8,7 +8,6 @@ import com.soebes.itf.jupiter.extension.MavenProject;
 import com.soebes.itf.jupiter.extension.MavenRepository;
 import com.soebes.itf.jupiter.extension.MavenTest;
 import com.soebes.itf.jupiter.maven.MavenExecutionResult;
-import org.apache.maven.model.Dependency;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Order;
@@ -50,7 +49,6 @@ public class DependOnAllProjectsIT {
         @Order(1)
         void the_first_test_case(MavenExecutionResult result) {
             final String groupId = result.getMavenProjectResult().getModel().getGroupId();
-            final String version = result.getMavenProjectResult().getModel().getVersion();
             assertThat(result).isFailure().out().error()
                     .contains("Rule 0: com.github.mikkoi.maven_enforcer_plugin.rule.DependOnAllProjects failed with message:")
                     .contains(String.format("Project '%s:%s' is missing dependency '%s:%s:%s'.", groupId, "z-aggregation", groupId, "subproject", "jar"))
@@ -130,14 +128,5 @@ public class DependOnAllProjectsIT {
             assertThat(result).isSuccessful();
         }
 
-    }
-
-    private Dependency getRootProjectAsDependency(MavenExecutionResult result) {
-        final Dependency rootProject = new Dependency();
-        rootProject.setType(result.getMavenProjectResult().getModel().getPackaging());
-        rootProject.setGroupId(result.getMavenProjectResult().getModel().getGroupId());
-        rootProject.setArtifactId(result.getMavenProjectResult().getModel().getArtifactId());
-        rootProject.setVersion(result.getMavenProjectResult().getModel().getVersion());
-        return rootProject;
     }
 }

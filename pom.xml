@@ -46,7 +46,6 @@
         <site>
             <id>maven-enforcer-rule-depend-on-all-projects.website</id>
             <name>Maven Enforcer Rule dependOnAllProjects</name>
-            <!-- <url>https://mikkoi.github.io/maven-enforcer-rule-depend-on-all-projects/</url>-->
             <url>scm:git:https://github.com/mikkoi/maven-enforcer-rule-depend-on-all-projects.git</url>
         </site>
     </distributionManagement>
