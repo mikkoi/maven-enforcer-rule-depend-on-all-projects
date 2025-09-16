@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Unit tests for DependOnAllProjects.
+ */
 class DependOnAllProjectsTest {
 
     @Test

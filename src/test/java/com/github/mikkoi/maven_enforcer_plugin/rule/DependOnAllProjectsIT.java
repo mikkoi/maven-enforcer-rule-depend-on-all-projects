@@ -15,6 +15,9 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import static com.soebes.itf.extension.assertj.MavenITAssertions.assertThat;
 
+/**
+ * Integration tests for DependOnAllProjects.
+ */
 @MavenJupiterExtension
 public class DependOnAllProjectsIT {
 
