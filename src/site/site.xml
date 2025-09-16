@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site xmlns="http://maven.apache.org/SITE/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://maven.apache.org/SITE/2.0.0 https://maven.apache.org/xsd/site-2.0.0.xsd"
-      name="Maven Enforcer Rule dependOnAllProjects">
-
-    <bannerLeft name="Maven Enforcer Rule dependOnAllProjects" href="#" />
+      name="Projects Maven Plugin">
 
     <skin>
         <groupId>org.apache.maven.skins</groupId>
         <artifactId>maven-fluido-skin</artifactId>
-        <version>1.8</version>
+        <version>2.1.0</version>
     </skin>
     <custom>
         <fluidoSkin>
+            <profile>pre-release</profile>
             <topBarEnabled>false</topBarEnabled>
             <sideBarEnabled>true</sideBarEnabled>
-
+            <sourceLineNumbersEnabled>true</sourceLineNumbersEnabled>
             <gitHub>
-                <projectId>github/mikkoi</projectId>
+                <projectId>github/mikkoi/projects-maven-plugin</projectId>
                 <ribbonOrientation>right</ribbonOrientation>
                 <ribbonColor>black</ribbonColor>
             </gitHub>
@@ -24,14 +23,14 @@
     </custom>
 
     <body>
-        <menu name="Maven Enforcer Rule dependOnAllProjects">
+        <menu name="Projects Maven Plugin">
             <item name="About" href="index.html"/>
             <item name="Quickstart" href="quickstart.html"/>
             <item name="Configuration" href="configuration.html"/>
         </menu>
 
+        <menu ref="project-information"/>
         <menu ref="reports"/>
-        <footer><![CDATA[<p>Copyright &#169; 2025 <a href="http://www.linkedin.com/in/mikkokoivunalho/">Mikko Koivunalho</a></p>]]></footer>
 
     </body>
 </site>

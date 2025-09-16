@@ -8,6 +8,9 @@
     <body>
         <release version="0.0.15" date="2030-12-31" description="Subsequent patch release while moving towards version 1.0.0">
             <action dev="mikkoi" type="update" date="2025-09-16">
+                Update site.xml to use the latest version of the Fluido skin.
+            </action>
+            <action dev="mikkoi" type="update" date="2025-09-16">
                 Correct checkstyle errors.
             </action>
         </release>
