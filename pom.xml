@@ -106,6 +106,9 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.organization>mikkoi</sonar.organization>
         <sonar.projectKey>mikkoi_maven-enforcer-rule-depend-on-all-projects</sonar.projectKey>
+        <sonar.java.spotbugs.reportPaths>${project.build.directory}/spotbugsXml.xml</sonar.java.spotbugs.reportPaths>
+        <sonar.java.pmd.reportPaths>${project.build.directory}/pmd.xml</sonar.java.pmd.reportPaths>
+        <sonar.java.checkstyle.reportPaths>${project.build.directory}/checkstyle-result.xml</sonar.java.checkstyle.reportPaths>
 
     </properties>
 
@@ -569,6 +572,7 @@
                             <failOnViolation>false</failOnViolation>
                             <consoleOutput>true</consoleOutput>
                             <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                            <excludeGeneratedSources>true</excludeGeneratedSources>
                             <violationSeverity>error</violationSeverity>
                             <failsOnError>false</failsOnError>
                             <suppressionsLocation>checkstyle-suppressions.xml</suppressionsLocation>
