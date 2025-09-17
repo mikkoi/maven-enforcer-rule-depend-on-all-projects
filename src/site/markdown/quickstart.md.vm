@@ -74,7 +74,6 @@ Another configuration example with separate `<pluginManagement>` definition:
                 </plugin>
             </plugins>
         </build>
-
     </project>
 
 To know more about plugin's configuration and parameters check the [mojo page](usage.html).

@@ -2,7 +2,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.mikkoi/maven-enforcer-rule-depend-on-all-projects.svg)](https://mvnrepository.com/artifact/com.github.mikkoi/maven-enforcer-rule-depend-on-all-projects)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=mikkoi_maven-enforcer-rule-depend-on-all-projects&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=mikkoi_maven-enforcer-rule-depend-on-all-projects)
 
-# Maven Enforcer Plugin Rule dependOnAllProjects
+# Maven Enforcer Rule dependOnAllProjects
 
 # Introduction
 
