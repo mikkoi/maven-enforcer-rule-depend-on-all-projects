@@ -106,6 +106,9 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
         if (Arrays.stream(t.split(":")).count() < 3) {
             t = t + ":.*";
         }
+        if (Arrays.stream(t.split(":")).count() < 4) {
+            System.out.println("Nothing");
+        }
         return t;
     }
 
