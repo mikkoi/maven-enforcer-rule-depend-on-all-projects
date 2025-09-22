@@ -3,10 +3,11 @@
         "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
         "https://checkstyle.org/dtds/suppressions_1_2.dtd">
 <suppressions>
-    <!-- suppress all checks on all files in a package -->
-
     <!-- suppress certain checks on all files -->
     <suppress files="." checks="LineLengthCheck"/>
     <suppress files="." checks="AvoidInlineConditionals"/>
     <suppress files="." checks="FinalParameters"/>
+
+    <!-- suppress TypeName checks on IT files, tolerate class 'set_001' -->
+    <suppress files=".*IT.java" checks="TypeName"/>
 </suppressions>
