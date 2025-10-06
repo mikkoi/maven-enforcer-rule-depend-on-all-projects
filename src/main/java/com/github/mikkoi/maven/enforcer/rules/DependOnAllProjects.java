@@ -1,4 +1,4 @@
-package com.github.mikkoi.maven_enforcer_plugin.rule;
+package com.github.mikkoi.maven.enforcer.rules;
 
 import javax.inject.Inject;
 import javax.inject.Named;
