@@ -7,6 +7,9 @@
     </properties>
     <body>
         <release version="0.0.16" date="2030-12-31" description="Subsequent patch release while moving towards version 1.0.0">
+            <action dev="mikkoi" type="update" date="2025-10-06">
+                Move rule to com.github.mikkoi.maven.enforcer.rules package hierarchy to be closer to Apache package hierarchy.
+            </action>
             <action dev="mikkoi" type="update" date="2025-09-22">
                 Suppress Checkstyle error TypeName in integration tests only. ITF framework style issue.
             </action>

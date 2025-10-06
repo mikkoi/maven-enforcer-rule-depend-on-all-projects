@@ -1,4 +1,4 @@
-package com.github.mikkoi.maven_enforcer_plugin.rule;
+package com.github.mikkoi.maven.enforcer.rules;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

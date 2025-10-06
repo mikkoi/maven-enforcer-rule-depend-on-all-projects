@@ -1,4 +1,4 @@
-package com.github.mikkoi.maven_enforcer_plugin.rule;
+package com.github.mikkoi.maven.enforcer.rules;
 
 import com.soebes.itf.jupiter.extension.MavenCLIOptions;
 import com.soebes.itf.jupiter.extension.MavenGoal;
@@ -53,7 +53,7 @@ public class DependOnAllProjectsIT {
         void theFirstTestCase(MavenExecutionResult result) {
             final String groupId = result.getMavenProjectResult().getModel().getGroupId();
             assertThat(result).isFailure().out().error()
-                    .contains("Rule 0: com.github.mikkoi.maven_enforcer_plugin.rule.DependOnAllProjects failed with message:")
+                    .contains("Rule 0: com.github.mikkoi.maven.enforcer.rules.DependOnAllProjects failed with message:")
                     .contains(String.format("Project '%s:%s' is missing dependency '%s:%s:%s'.", groupId, "z-aggregation", groupId, "subproject", "jar"))
                     .contains(String.format("Project '%s:%s' is missing dependency '%s:%s:%s'.", groupId, "z-aggregation", groupId, "other-second-fourth", "jar"));
         }
