@@ -1,1 +1,1 @@
-memberSearchIndex = [{"p":"com.github.mikkoi.maven_enforcer_plugin.rule","c":"DependOnAllProjectsIT","l":"DependOnAllProjectsIT()","u":"%3Cinit%3E()"}];updateSearchResults();
+memberSearchIndex = [{"p":"com.github.mikkoi.maven.enforcer.rules","c":"DependOnAllProjectsIT","l":"DependOnAllProjectsIT()","u":"%3Cinit%3E()"}];updateSearchResults();

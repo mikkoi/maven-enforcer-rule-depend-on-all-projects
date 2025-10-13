@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DependOnAllProjects.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Maven Enforcer Rule dependOnAllProjects</a> &gt; <a href="index.source.html" class="el_package">com.github.mikkoi.maven.enforcer.rules</a> &gt; <span class="el_source">DependOnAllProjects.java</span></div><h1>DependOnAllProjects.java</h1><pre class="source lang-java linenums">package com.github.mikkoi.maven.enforcer.rules;
+
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.apache.maven.enforcer.rule.api.AbstractEnforcerRule;
+import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.project.MavenProject;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
+
+/**
+ * Maven Enforcer Custom Rule.
+ */
+<span class="nc" id="L23">@Named(&quot;dependOnAllProjects&quot;)</span>
+public class DependOnAllProjects extends AbstractEnforcerRule {
+
+    /**
+     * Constant value
+     * Size of indentation inside a &amp;lt;dependency&gt;&amp;gt; definition.
+     */
+    private static final String INDENT_DEPENDENCY = &quot;    &quot;;
+    /**
+     * Constant values for faking boolean parameters.
+     */
+    private static final String FALSE = &quot;false&quot;;
+    private static final String TRUE = &quot;true&quot;;
+    /**
+     * Inject needed Maven component.
+      */
+    private final MavenSession mavenSession;
+    /**
+     * Include by project [groupId:]artifactId[:packagingType].
+     * Default value: all projects included.
+     */
+    private List&lt;String&gt; includes;
+    /**
+     * Exclude by project [groupId:]artifactId[:packagingType].
+     * Default value: No projects excluded.
+     * If includes list contains any items, they are evaluated first.
+     * Then excludes are excluded from them.
+     */
+    private List&lt;String&gt; excludes;
+    /**
+     * Error if unknown project in includes/excludes.
+     * If a wildcard (*) is used in the name, this parameter has no effect.
+     */
+    @SuppressWarnings(&quot;unused&quot;) // Not actually unused. Set via Plexus/Sisu Container.
+    private String errorIfUnknownProject;
+    /**
+     * Include Maven root project.
+     */
+    @SuppressWarnings(&quot;unused&quot;) // Not actually unused. Set via Plexus/Sisu Container.
+    private String includeRootProject;
+
+    /**
+     * Constructor.
+     *
+     * @param session            Initialized MavenSession object.
+     */
+    @Inject
+    @SuppressFBWarnings
+<span class="nc" id="L71">    public DependOnAllProjects(MavenSession session) {</span>
+<span class="nc" id="L72">        this.mavenSession = Objects.requireNonNull(session);</span>
+<span class="nc" id="L73">    }</span>
+
+    /**
+     * Set includes.
+     * @param includes the includes
+     */
+    @Inject
+    public void setIncludes(@Nullable List&lt;String&gt; includes) {
+<span class="nc bnc" id="L81" title="All 2 branches missed.">        if ( includes == null ) {</span>
+<span class="nc" id="L82">            this.includes = new ArrayList&lt;&gt;();</span>
+        } else {
+<span class="nc" id="L84">            this.includes = new ArrayList&lt;&gt;(includes);</span>
+        }
+<span class="nc" id="L86">    }</span>
+
+    /**
+     * Set excludes.
+     * @param excludes the excludes
+     */
+    @Inject
+    public void setExcludes(@Nullable List&lt;String&gt; excludes) {
+<span class="nc bnc" id="L94" title="All 2 branches missed.">        if ( excludes == null ) {</span>
+<span class="nc" id="L95">            this.excludes = new ArrayList&lt;&gt;();</span>
+        } else {
+<span class="nc" id="L97">            this.excludes = new ArrayList&lt;&gt;(excludes);</span>
+        }
+<span class="nc" id="L99">    }</span>
+
+    /**
+     * Set errorIfUnknownProject.
+     * @param errorIfUnknownProject the errorIfUnknownProject
+     */
+    @Inject
+    public void setErrorIfUnknownProject(String errorIfUnknownProject) {
+<span class="nc bnc" id="L107" title="All 2 branches missed.">        if ( errorIfUnknownProject != null ) {</span>
+<span class="nc" id="L108">            this.errorIfUnknownProject = errorIfUnknownProject;</span>
+        } else {
+<span class="nc" id="L110">            this.errorIfUnknownProject = FALSE;</span>
+        }
+<span class="nc" id="L112">    }</span>
+
+    /**
+     * Set includeRootProject.
+     * @param includeRootProject the includeRootProject
+     */
+    @Inject
+    public void setIncludeRootProject(String includeRootProject) {
+<span class="nc bnc" id="L120" title="All 2 branches missed.">        if ( includeRootProject != null ) {</span>
+<span class="nc" id="L121">            this.includeRootProject = includeRootProject;</span>
+        } else {
+<span class="nc" id="L123">            this.includeRootProject = FALSE;</span>
+        }
+<span class="nc" id="L125">    }</span>
+
+    /**
+     * Format Dependency object to XML snippet.
+     * User can simply copy-paste this to the project.
+     * @param dependency Dependency object
+     * @param indent     Indentation string, e.g. &quot;    &quot;
+     * @return Formatted XML snippet
+     */
+    public static String formatDependency(Dependency dependency, String indent) {
+<span class="nc" id="L135">        final String newLine = System.lineSeparator();</span>
+<span class="nc" id="L136">        final StringBuilder sb = new StringBuilder();</span>
+<span class="nc" id="L137">        sb.append(&quot;&lt;dependency&gt;&quot;).append(newLine);</span>
+<span class="nc" id="L138">        sb.append(indent).append(String.format(&quot;&lt;groupId&gt;%s&lt;/groupId&gt;&quot;, dependency.getGroupId()))</span>
+<span class="nc" id="L139">            .append(newLine);</span>
+<span class="nc" id="L140">        sb.append(indent)</span>
+<span class="nc" id="L141">            .append(String.format(&quot;&lt;artifactId&gt;%s&lt;/artifactId&gt;&quot;, dependency.getArtifactId()))</span>
+<span class="nc" id="L142">            .append(newLine);</span>
+<span class="nc bnc" id="L143" title="All 2 branches missed.">        if (!&quot;jar&quot;.equals(dependency.getType())) {</span>
+<span class="nc" id="L144">            sb.append(indent).append(String.format(&quot;&lt;type&gt;%s&lt;/type&gt;&quot;, dependency.getType()))</span>
+<span class="nc" id="L145">                .append(newLine);</span>
+        }
+<span class="nc" id="L147">        sb.append(&quot;&lt;/dependency&gt;&quot;);</span>
+<span class="nc" id="L148">        return sb.toString();</span>
+    }
+
+    /**
+     * Convert string for matching.
+     *
+     * @param s String
+     * @return converted string
+     */
+    public static String convertStringForMatching(String s) {
+<span class="nc" id="L158">        String t = s.replace(&quot;.&quot;, &quot;\\.&quot;);</span>
+<span class="nc" id="L159">        t = t.replace(&quot;*&quot;, &quot;.*&quot;);</span>
+<span class="nc bnc" id="L160" title="All 2 branches missed.">        if (!t.contains(&quot;:&quot;)) {</span>
+<span class="nc" id="L161">            t = &quot;.*:&quot; + t + &quot;:.*&quot;;</span>
+        }
+<span class="nc bnc" id="L163" title="All 2 branches missed.">        if (Arrays.stream(t.split(&quot;:&quot;)).count() &lt; 3) {</span>
+<span class="nc" id="L164">            t = t + &quot;:.*&quot;;</span>
+        }
+<span class="nc" id="L166">        return t;</span>
+    }
+
+    /**
+     * Compare two MavenProject objects.
+     * GroupId, ArtifactId, Version and Packaging must match.
+     *
+     * @param a MavenProject a
+     * @param b MavenProject b
+     * @return true if projects are equal
+     */
+    public static boolean projectsAreEquals(MavenProject a, MavenProject b) {
+<span class="nc bnc" id="L178" title="All 2 branches missed.">        return a.getGroupId().equals(b.getGroupId())</span>
+<span class="nc bnc" id="L179" title="All 4 branches missed.">            &amp;&amp; a.getArtifactId().equals(b.getArtifactId()) &amp;&amp; a.getVersion().equals(b.getVersion())</span>
+<span class="nc bnc" id="L180" title="All 2 branches missed.">            &amp;&amp; a.getPackaging().equals(b.getPackaging());</span>
+    }
+
+    /**
+     * Compare two Dependency objects.
+     * GroupId, ArtifactId, Version and Type must match.
+     *
+     * @param a Dependency a
+     * @param b Dependency b
+     * @return true if dependencies are equal
+     */
+    public static boolean dependenciesAreEquals(Dependency a, Dependency b) {
+<span class="nc bnc" id="L192" title="All 2 branches missed.">        return a.getGroupId().equals(b.getGroupId())</span>
+<span class="nc bnc" id="L193" title="All 4 branches missed.">            &amp;&amp; a.getArtifactId().equals(b.getArtifactId()) &amp;&amp; a.getVersion().equals(b.getVersion())</span>
+<span class="nc bnc" id="L194" title="All 2 branches missed.">            &amp;&amp; a.getType().equals(b.getType());</span>
+    }
+
+    /**
+     * Does the list (Iterable) of Dependency objects contain the MavenProject?
+     *
+     * @param projects Iterable of Dependency objects
+     * @param project  a Maven project object
+     * @return true if project is found
+     */
+    public static boolean dependenciesContains(Iterable&lt;Dependency&gt; projects,
+                                               MavenProject project) {
+<span class="nc bnc" id="L206" title="All 2 branches missed.">        for (Dependency p : projects) {</span>
+<span class="nc bnc" id="L207" title="All 2 branches missed.">            if (dependenciesAreEquals(p, projectToDependency(project))) {</span>
+<span class="nc" id="L208">                return true;</span>
+            }
+<span class="nc" id="L210">        }</span>
+<span class="nc" id="L211">        return false;</span>
+    }
+
+    /**
+     * Does any of the projects in Maven Reactor build match with this project name?
+     * Name must not have a wildcard!
+     *
+     * @param projects    Iterable of MavenProject objects
+     * @param projectName Project name, e.g. &quot;artifactId&quot;, &quot;groupId:artifactId&quot;, &quot;groupId:artifactId:packingType&quot;.
+     * @return Boolean
+     */
+    public static boolean projectsContains(Iterable&lt;MavenProject&gt; projects, String projectName) {
+<span class="nc" id="L223">        List&lt;String&gt; ids = Arrays.asList(projectName.split(&quot;:&quot;));</span>
+<span class="nc bnc" id="L224" title="All 2 branches missed.">        for (MavenProject project : projects) {</span>
+<span class="nc bnc" id="L225" title="All 2 branches missed.">            if (ids.size() == 1) {</span>
+<span class="nc bnc" id="L226" title="All 2 branches missed.">                if (project.getArtifactId().equals(ids.get(0))) {</span>
+<span class="nc" id="L227">                    return true;</span>
+                }
+<span class="nc bnc" id="L229" title="All 2 branches missed.">            } else if (ids.size() == 2) {</span>
+<span class="nc bnc" id="L230" title="All 2 branches missed.">                if (project.getGroupId().equals(ids.get(0))</span>
+<span class="nc bnc" id="L231" title="All 2 branches missed.">                    &amp;&amp; project.getArtifactId().equals(ids.get(1))) {</span>
+<span class="nc" id="L232">                    return true;</span>
+                }
+            } else {
+<span class="nc bnc" id="L235" title="All 2 branches missed.">                assert ids.size() == 3;</span>
+<span class="nc bnc" id="L236" title="All 2 branches missed.">                if (project.getGroupId().equals(ids.get(0))</span>
+<span class="nc bnc" id="L237" title="All 2 branches missed.">                    &amp;&amp; project.getArtifactId().equals(ids.get(1))</span>
+<span class="nc bnc" id="L238" title="All 2 branches missed.">                    &amp;&amp; project.getPackaging().equals(ids.get(2))) {</span>
+<span class="nc" id="L239">                    return true;</span>
+                }
+            }
+<span class="nc" id="L242">        }</span>
+<span class="nc" id="L243">        return false;</span>
+    }
+
+    /**
+     * Convert MavenProject to Dependency object.
+     *
+     * @param mavenProject MavenProject object
+     * @return Dependency object
+     */
+    public static Dependency projectToDependency(MavenProject mavenProject) {
+<span class="nc" id="L253">        Dependency d = new Dependency();</span>
+<span class="nc" id="L254">        d.setGroupId(mavenProject.getGroupId());</span>
+<span class="nc" id="L255">        d.setArtifactId(mavenProject.getArtifactId());</span>
+<span class="nc" id="L256">        d.setVersion(mavenProject.getVersion());</span>
+<span class="nc" id="L257">        d.setType(mavenProject.getPackaging());</span>
+<span class="nc" id="L258">        return d;</span>
+    }
+
+    /**
+     * Match projects with includes and excludes.
+     * Includes are * by default. Then excludes are excluded from the includes.
+     *
+     * @param includes     Included projects. Default: *
+     * @param excludes     Excluded projects. Default: none
+     * @param mavenProject Initialized MavenProject object.
+     * @return True or false.
+     */
+    public static boolean isProjectIncluded(List&lt;String&gt; includes, List&lt;String&gt; excludes,
+                                            MavenProject mavenProject) {
+<span class="nc" id="L272">        String projectId =</span>
+<span class="nc" id="L273">            String.format(&quot;%s:%s:%s&quot;, mavenProject.getGroupId(), mavenProject.getArtifactId(),</span>
+<span class="nc" id="L274">                mavenProject.getPackaging());</span>
+
+        // Match from the end of the id, artifactId alone is enough.
+<span class="nc" id="L277">        Predicate&lt;String&gt; predicateForProjectId =</span>
+<span class="nc" id="L278">            s -&gt; projectId.matches(convertStringForMatching(s));</span>
+<span class="nc bnc" id="L279" title="All 2 branches missed.">        return includes.stream().anyMatch(predicateForProjectId)</span>
+<span class="nc bnc" id="L280" title="All 2 branches missed.">            &amp;&amp; excludes.stream().noneMatch(predicateForProjectId);</span>
+    }
+
+    /**
+     * Validate parameters provided via properties
+     * either on the command line or using configuration element in pom.
+     *
+     * @throws EnforcerRuleException if parameter validation fails.
+     */
+    void validateAndPrepareParameters() throws EnforcerRuleException {
+<span class="nc" id="L290">        getLog().debug(&quot;includes=&quot; + includes);</span>
+<span class="nc" id="L291">        getLog().debug(&quot;excludes=&quot; + excludes);</span>
+<span class="nc" id="L292">        getLog().debug(&quot;errorIfUnknownProject=&quot; + errorIfUnknownProject);</span>
+<span class="nc" id="L293">        getLog().debug(&quot;includeRootProject=&quot; + includeRootProject);</span>
+
+<span class="nc" id="L295">        final List&lt;MavenProject&gt; reactorProjects =</span>
+<span class="nc" id="L296">            mavenSession.getProjectDependencyGraph().getSortedProjects();</span>
+<span class="nc" id="L297">        getLog().debug(&quot;reactorProjects=&quot; + reactorProjects);</span>
+
+        /* There is a bug in Maven/Sisu/Plexus container, which sets includes to a list with one empty string,
+         * if the parameter is not set. So we need to check for this case and convert it to an empty list.
+         * Then we can add the default value of &quot;*&quot;.
+         */
+<span class="nc bnc" id="L303" title="All 6 branches missed.">        if ( (includes == null) || (includes.size() == 1 &amp;&amp; &quot;&quot;.equals(includes.get(0))) ) {</span>
+<span class="nc" id="L304">            includes = new ArrayList&lt;&gt;();</span>
+        }
+<span class="nc bnc" id="L306" title="All 2 branches missed.">        if (excludes == null) {</span>
+<span class="nc" id="L307">            excludes = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L308" title="All 4 branches missed.">        } else if (excludes.size() == 1 &amp;&amp; &quot;&quot;.equals(excludes.get(0))) {</span>
+<span class="nc" id="L309">            excludes = new ArrayList&lt;&gt;();</span>
+        }
+<span class="nc" id="L311">        getLog().debug(String.format(&quot;Parameter includes.size: %d&quot;, includes.size()));</span>
+<span class="nc bnc" id="L312" title="All 2 branches missed.">        for (String a : includes) {</span>
+<span class="nc" id="L313">            getLog().debug(String.format(&quot;Check include '%s'&quot;, a));</span>
+<span class="nc bnc" id="L314" title="All 2 branches missed.">            if (a == null) {</span>
+<span class="nc" id="L315">                throw new EnforcerRuleException(</span>
+                    &quot;Failure in parameter 'includes'. String is null&quot;);
+            }
+<span class="nc bnc" id="L318" title="All 2 branches missed.">            if (a.matches(&quot;^[\t\n ]+$&quot;)) {</span>
+<span class="nc" id="L319">                throw new EnforcerRuleException(</span>
+<span class="nc" id="L320">                    String.format(&quot;Failure in parameter 'includes'. String contains only whitespace: '%s'&quot;, a));</span>
+            }
+<span class="nc" id="L322">            List&lt;String&gt; ids = Arrays.asList(a.split(&quot;:&quot;));</span>
+<span class="nc bnc" id="L323" title="All 2 branches missed.">            if (ids.size() &gt; 3) {</span>
+<span class="nc" id="L324">                throw new EnforcerRuleException(</span>
+                    &quot;Failure in parameter 'includes'. String is invalid&quot;);
+            }
+            /* If there is a wildcard, we cannot check if the project exists in the build.
+             * So we skip the check in this case.
+             */
+<span class="nc bnc" id="L330" title="All 4 branches missed.">            if (TRUE.equals(errorIfUnknownProject) &amp;&amp; !a.contains(&quot;*&quot;)</span>
+<span class="nc bnc" id="L331" title="All 2 branches missed.">                &amp;&amp; !projectsContains(reactorProjects, a)) {</span>
+<span class="nc" id="L332">                throw new EnforcerRuleException(String.format(</span>
+                    &quot;Failure in parameter 'includes'. Project '%s' not found in build&quot;, a));
+            }
+<span class="nc" id="L335">        }</span>
+<span class="nc bnc" id="L336" title="All 2 branches missed.">        if (includes.isEmpty()) {</span>
+<span class="nc" id="L337">            includes.add(&quot;*&quot;);</span>
+        }
+
+<span class="nc" id="L340">        getLog().debug(String.format(&quot;Parameter excludes.size: %d&quot;, excludes.size()));</span>
+<span class="nc bnc" id="L341" title="All 2 branches missed.">        for (String a : excludes) {</span>
+<span class="nc" id="L342">            getLog().debug(String.format(&quot;Check exclude '%s'&quot;, a));</span>
+<span class="nc bnc" id="L343" title="All 2 branches missed.">            if (a == null) {</span>
+<span class="nc" id="L344">                throw new EnforcerRuleException(</span>
+                    &quot;Failure in parameter 'excludes'. String is null&quot;);
+            }
+<span class="nc bnc" id="L347" title="All 2 branches missed.">            if (a.matches(&quot;^[\t\n ]+$&quot;)) {</span>
+<span class="nc" id="L348">                throw new EnforcerRuleException(</span>
+<span class="nc" id="L349">                    String.format(&quot;Failure in parameter 'excludes'. String contains only whitespace: '%s'&quot;, a));</span>
+            }
+<span class="nc" id="L351">            List&lt;String&gt; ids = Arrays.asList(a.split(&quot;:&quot;));</span>
+<span class="nc bnc" id="L352" title="All 2 branches missed.">            if (ids.size() &gt; 3) {</span>
+<span class="nc" id="L353">                throw new EnforcerRuleException(</span>
+                    &quot;Failure in parameter 'excludes'. String is invalid&quot;);
+            }
+            /* If there is a wildcard, we cannot check if the project exists in the build.
+             * So we skip the check in this case.
+             */
+<span class="nc bnc" id="L359" title="All 4 branches missed.">            if (TRUE.equals(errorIfUnknownProject) &amp;&amp; !a.contains(&quot;*&quot;)</span>
+<span class="nc bnc" id="L360" title="All 2 branches missed.">                &amp;&amp; !projectsContains(reactorProjects, a)) {</span>
+<span class="nc" id="L361">                throw new EnforcerRuleException(String.format(</span>
+                    &quot;Failure in parameter 'excludes'. Project '%s' not found in build&quot;, a));
+            }
+<span class="nc" id="L364">        }</span>
+
+<span class="nc bnc" id="L366" title="All 4 branches missed.">        if (errorIfUnknownProject == null || errorIfUnknownProject.isEmpty()) {</span>
+<span class="nc" id="L367">            errorIfUnknownProject = FALSE;</span>
+        }
+<span class="nc bnc" id="L369" title="All 4 branches missed.">        if (includeRootProject == null || includeRootProject.isEmpty()) {</span>
+<span class="nc" id="L370">            includeRootProject = FALSE;</span>
+        }
+<span class="nc bnc" id="L372" title="All 4 branches missed.">        if (!TRUE.equals(errorIfUnknownProject) &amp;&amp; !FALSE.equals(errorIfUnknownProject)) {</span>
+<span class="nc" id="L373">            throw new EnforcerRuleException(</span>
+<span class="nc" id="L374">                String.format(&quot;Failure in parameter 'errorIfUnknownProject'. Must be 'true' or 'false': '%s'&quot;, errorIfUnknownProject));</span>
+        }
+<span class="nc bnc" id="L376" title="All 4 branches missed.">        if (!TRUE.equals(includeRootProject) &amp;&amp; !FALSE.equals(includeRootProject)) {</span>
+<span class="nc" id="L377">            throw new EnforcerRuleException(</span>
+<span class="nc" id="L378">                String.format(&quot;Failure in parameter 'includeRootProject'. Must be 'true' or 'false': '%s'&quot;, includeRootProject));</span>
+        }
+
+<span class="nc" id="L381">        getLog().debug(&quot;includes(resolved)=&quot; + includes);</span>
+<span class="nc" id="L382">        getLog().debug(&quot;excludes(resolved)=&quot; + excludes);</span>
+<span class="nc" id="L383">        getLog().debug(&quot;errorIfUnknownProject(resolved)=&quot; + errorIfUnknownProject);</span>
+<span class="nc" id="L384">        getLog().debug(&quot;includeRootProject(resolved)=&quot; + includeRootProject);</span>
+<span class="nc" id="L385">    }</span>
+
+    /**
+     * The rule logic.
+     * Collect all projects in the build and filter according to includes/excludes.
+     * Match the list with the dependencies of the current project.
+     * If the two lists do not match, Raise EnforcerRuleException
+     *
+     * @throws EnforcerRuleException if rule fails.
+     */
+    public void dependOnAllProjects() throws EnforcerRuleException {
+<span class="nc" id="L396">        List&lt;MavenProject&gt; includedProjects = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L397">        MavenProject currentProject = mavenSession.getCurrentProject();</span>
+<span class="nc" id="L398">        getLog().debug(String.format(&quot;Current Project: %s:%s&quot;, currentProject.getGroupId(),</span>
+<span class="nc" id="L399">            currentProject.getArtifactId()));</span>
+
+<span class="nc" id="L401">        getLog().debug(&quot;Iterate through all projects in Maven Dependency Graph, i.e. the build.&quot;);</span>
+<span class="nc" id="L402">        mavenSession.getProjectDependencyGraph().getSortedProjects().forEach(project -&gt; {</span>
+<span class="nc" id="L403">            String projectId =</span>
+<span class="nc" id="L404">                String.format(&quot;%s:%s:%s&quot;, project.getGroupId(), project.getArtifactId(),</span>
+<span class="nc" id="L405">                    project.getVersion());</span>
+<span class="nc" id="L406">            getLog().debug(&quot;    &quot; + projectId);</span>
+
+<span class="nc bnc" id="L408" title="All 2 branches missed.">            if (isIncluded(project)) {</span>
+<span class="nc bnc" id="L409" title="All 4 branches missed.">                if (projectsAreEquals(project, currentProject) || (!TRUE.equals(this.includeRootProject)</span>
+<span class="nc bnc" id="L410" title="All 2 branches missed.">                    &amp;&amp; projectsAreEquals(project, mavenSession.getTopLevelProject()))) {</span>
+<span class="nc" id="L411">                    getLog().debug(&quot;Filter out project: &quot;</span>
+<span class="nc" id="L412">                        + String.format(&quot;%s:%s&quot;, project.getGroupId(), project.getArtifactId()));</span>
+                } else {
+<span class="nc" id="L414">                    includedProjects.add(project);</span>
+                }
+            }
+<span class="nc" id="L417">        });</span>
+<span class="nc" id="L418">        getLog().debug(&quot;includedProjects=%s&quot; + includedProjects);</span>
+<span class="nc" id="L419">        List&lt;MavenProject&gt; missingProjects = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L420" title="All 2 branches missed.">        for (MavenProject project : includedProjects) {</span>
+<span class="nc" id="L421">            @SuppressWarnings(&quot;unchecked&quot;) List&lt;Dependency&gt; dependencies =</span>
+<span class="nc" id="L422">                currentProject.getDependencies();</span>
+<span class="nc bnc" id="L423" title="All 2 branches missed.">            if (!dependenciesContains(dependencies, project)) {</span>
+<span class="nc" id="L424">                missingProjects.add(project);</span>
+            }
+<span class="nc" id="L426">        }</span>
+<span class="nc bnc" id="L427" title="All 2 branches missed.">        if (!missingProjects.isEmpty()) {</span>
+<span class="nc" id="L428">            List&lt;String&gt; errors = new ArrayList&lt;&gt;(missingProjects.size());</span>
+<span class="nc bnc" id="L429" title="All 2 branches missed.">            for (MavenProject missingProject : missingProjects) {</span>
+<span class="nc" id="L430">                errors.add(String.format(&quot;Project '%s:%s' is missing dependency '%s:%s:%s'.&quot;,</span>
+<span class="nc" id="L431">                    currentProject.getGroupId(), currentProject.getArtifactId(),</span>
+<span class="nc" id="L432">                    missingProject.getGroupId(), missingProject.getArtifactId(),</span>
+<span class="nc" id="L433">                    missingProject.getPackaging()));</span>
+<span class="nc" id="L434">            }</span>
+<span class="nc" id="L435">            StringBuilder sb = new StringBuilder();</span>
+<span class="nc" id="L436">            sb.append(String.format(&quot;Missing definitions from the project '%s:%s':&quot;,</span>
+<span class="nc" id="L437">                currentProject.getGroupId(), currentProject.getArtifactId()));</span>
+<span class="nc" id="L438">            sb.append(System.lineSeparator());</span>
+<span class="nc" id="L439">            sb.append(&quot;&lt;!--     Created by Maven Enforcer rule dependOnAllProjects     ---&gt;&quot;);</span>
+<span class="nc" id="L440">            sb.append(System.lineSeparator());</span>
+<span class="nc bnc" id="L441" title="All 2 branches missed.">            for (MavenProject missingProject : missingProjects) {</span>
+<span class="nc" id="L442">                sb.append(formatDependency(projectToDependency(missingProject), INDENT_DEPENDENCY));</span>
+<span class="nc" id="L443">                sb.append(System.lineSeparator());</span>
+<span class="nc" id="L444">            }</span>
+<span class="nc" id="L445">            sb.append(&quot;&lt;!--     / Created by Maven Enforcer rule dependOnAllProjects     ---&gt;&quot;);</span>
+<span class="nc" id="L446">            errors.add(sb.toString());</span>
+<span class="nc" id="L447">            throw new EnforcerRuleException(String.join(&quot;\n&quot;, errors));</span>
+        }
+<span class="nc" id="L449">        getLog().debug(&quot;End of iterate&quot;);</span>
+<span class="nc" id="L450">    }</span>
+
+    /**
+     * The main entry point for rule.
+     *
+     * @throws EnforcerRuleException if rule fails.
+     */
+    @Override
+    public void execute() throws EnforcerRuleException {
+<span class="nc" id="L459">        MavenProject currentProject = mavenSession.getCurrentProject();</span>
+<span class="nc" id="L460">        getLog().debug(String.format(&quot;Current Project: %s:%s&quot;, currentProject.getGroupId(),</span>
+<span class="nc" id="L461">            currentProject.getArtifactId()));</span>
+<span class="nc" id="L462">        MavenProject topLevelProject = mavenSession.getTopLevelProject();</span>
+<span class="nc" id="L463">        getLog().debug(String.format(&quot;Top Level Project: %s:%s&quot;, topLevelProject.getGroupId(),</span>
+<span class="nc" id="L464">            topLevelProject.getArtifactId()));</span>
+
+<span class="nc" id="L466">        validateAndPrepareParameters();</span>
+
+<span class="nc" id="L468">        dependOnAllProjects();</span>
+<span class="nc" id="L469">    }</span>
+
+    /**
+     * String representation of the rule.
+     * Output is used in verbose Maven logs, can help during investigate problems.
+     *
+     * @return rule description
+     */
+    @Override
+    public String toString() {
+<span class="nc" id="L479">        return String.format(</span>
+            &quot;DependOnAllProjects[includes=%s;excludes=%s;includeRootProject=%s;errorIfUnknownProject=%s]&quot;,
+            includes, excludes, includeRootProject, errorIfUnknownProject);
+    }
+
+    boolean isIncluded(MavenProject mavenProject) {
+<span class="nc" id="L485">        boolean r = isProjectIncluded(this.includes, this.excludes, mavenProject);</span>
+<span class="nc" id="L486">        getLog().debug(String.format(&quot;isIncluded(%s:%s:%s:%s): %b&quot;, mavenProject.getGroupId(),</span>
+<span class="nc" id="L487">            mavenProject.getArtifactId(), mavenProject.getVersion(), mavenProject.getPackaging(),</span>
+<span class="nc" id="L488">            r));</span>
+<span class="nc" id="L489">        return r;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
