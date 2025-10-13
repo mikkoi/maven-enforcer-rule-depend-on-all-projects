@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.github.mikkoi</groupId>
+        <artifactId>maven-enforcer-rule-depend-on-all-projects-set-008</artifactId>
+        <version>@project.version@</version>
+    </parent>
+
+    <artifactId>z-aggregation</artifactId>
+    <packaging>pom</packaging>
+    <name>Z Aggregation</name>
+    <description>This project is dependent on no projects.</description>
+
+    <dependencies>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-depend-on-all-projects</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <dependOnAllProjects>
+                                    <!-- Add here all projects which do not have any code coverage reports ... -->
+                                    <excludes>
+                                        <exclude>   </exclude>
+                                    </excludes>
+                                    <errorIfUnknownProject>true</errorIfUnknownProject>
+                                </dependOnAllProjects>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

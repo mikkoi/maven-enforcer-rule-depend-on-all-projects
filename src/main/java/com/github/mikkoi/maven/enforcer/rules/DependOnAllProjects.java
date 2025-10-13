@@ -1,5 +1,6 @@
 package com.github.mikkoi.maven.enforcer.rules;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -28,9 +29,19 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
      */
     private static final String INDENT_DEPENDENCY = "    ";
     /**
+     * Constant values for faking boolean parameters.
+     */
+    private static final String FALSE = "false";
+    private static final String TRUE = "true";
+    /**
      * Inject needed Maven component.
       */
     private final MavenSession mavenSession;
+    /**
+     * Include by project [groupId:]artifactId[:packagingType].
+     * Default value: all projects included.
+     */
+    private List<String> includes;
     /**
      * Exclude by project [groupId:]artifactId[:packagingType].
      * Default value: No projects excluded.
@@ -39,21 +50,16 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
      */
     private List<String> excludes;
     /**
-     * Include by project [groupId:]artifactId[:packagingType].
-     * Default value: all projects included.
-     */
-    private List<String> includes;
-    /**
      * Error if unknown project in includes/excludes.
      * If a wildcard (*) is used in the name, this parameter has no effect.
      */
     @SuppressWarnings("unused") // Not actually unused. Set via Plexus/Sisu Container.
-    private boolean errorIfUnknownProject;
+    private String errorIfUnknownProject;
     /**
      * Include Maven root project.
      */
     @SuppressWarnings("unused") // Not actually unused. Set via Plexus/Sisu Container.
-    private boolean includeRootProject;
+    private String includeRootProject;
 
     /**
      * Constructor.
@@ -64,6 +70,58 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
     @SuppressFBWarnings
     public DependOnAllProjects(MavenSession session) {
         this.mavenSession = Objects.requireNonNull(session);
+    }
+
+    /**
+     * Set includes.
+     * @param includes the includes
+     */
+    @Inject
+    public void setIncludes(@Nullable List<String> includes) {
+        if ( includes == null ) {
+            this.includes = new ArrayList<>();
+        } else {
+            this.includes = new ArrayList<>(includes);
+        }
+    }
+
+    /**
+     * Set excludes.
+     * @param excludes the excludes
+     */
+    @Inject
+    public void setExcludes(@Nullable List<String> excludes) {
+        if ( excludes == null ) {
+            this.excludes = new ArrayList<>();
+        } else {
+            this.excludes = new ArrayList<>(excludes);
+        }
+    }
+
+    /**
+     * Set errorIfUnknownProject.
+     * @param errorIfUnknownProject the errorIfUnknownProject
+     */
+    @Inject
+    public void setErrorIfUnknownProject(String errorIfUnknownProject) {
+        if ( errorIfUnknownProject != null ) {
+            this.errorIfUnknownProject = errorIfUnknownProject;
+        } else {
+            this.errorIfUnknownProject = FALSE;
+        }
+    }
+
+    /**
+     * Set includeRootProject.
+     * @param includeRootProject the includeRootProject
+     */
+    @Inject
+    public void setIncludeRootProject(String includeRootProject) {
+        if ( includeRootProject != null ) {
+            this.includeRootProject = includeRootProject;
+        } else {
+            this.includeRootProject = FALSE;
+        }
     }
 
     /**
@@ -82,7 +140,6 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
         sb.append(indent)
             .append(String.format("<artifactId>%s</artifactId>", dependency.getArtifactId()))
             .append(newLine);
-        // .append(indent).append(String.format("<version>%s</version>", dependency.getVersion())).append(newLine)
         if (!"jar".equals(dependency.getType())) {
             sb.append(indent).append(String.format("<type>%s</type>", dependency.getType()))
                 .append(newLine);
@@ -229,7 +286,7 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
      *
      * @throws EnforcerRuleException if parameter validation fails.
      */
-    private void validateAndPrepareParameters() throws EnforcerRuleException {
+    void validateAndPrepareParameters() throws EnforcerRuleException {
         getLog().debug("includes=" + includes);
         getLog().debug("excludes=" + excludes);
         getLog().debug("errorIfUnknownProject=" + errorIfUnknownProject);
@@ -239,49 +296,84 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
             mavenSession.getProjectDependencyGraph().getSortedProjects();
         getLog().debug("reactorProjects=" + reactorProjects);
 
-        if (includes == null) {
+        /* There is a bug in Maven/Sisu/Plexus container, which sets includes to a list with one empty string,
+         * if the parameter is not set. So we need to check for this case and convert it to an empty list.
+         * Then we can add the default value of "*".
+         */
+        if ( (includes == null) || (includes.size() == 1 && "".equals(includes.get(0))) ) {
             includes = new ArrayList<>();
         }
-        if (excludes == null) {
+        if ( excludes == null || (excludes.size() == 1 && "".equals(excludes.get(0))) ) {
             excludes = new ArrayList<>();
         }
+        getLog().debug(String.format("Parameter includes.size: %d", includes.size()));
         for (String a : includes) {
             getLog().debug(String.format("Check include '%s'", a));
-            if (a == null || a.isEmpty() || a.matches("^[\t\n ]*$")) {
+            if (a == null) {
                 throw new EnforcerRuleException(
-                    "Failure in parameter 'includes'. String is null, empty or contains only whitespace");
+                    "Failure in parameter 'includes'. String is null");
+            }
+            if (a.matches("^[\t\n ]+$")) {
+                throw new EnforcerRuleException(
+                    String.format("Failure in parameter 'includes'. String contains only whitespace: '%s'", a));
             }
             List<String> ids = Arrays.asList(a.split(":"));
             if (ids.size() > 3) {
                 throw new EnforcerRuleException(
                     "Failure in parameter 'includes'. String is invalid");
             }
-            if (errorIfUnknownProject && !a.contains("*")
+            /* If there is a wildcard, we cannot check if the project exists in the build.
+             * So we skip the check in this case.
+             */
+            if (TRUE.equals(errorIfUnknownProject) && !a.contains("*")
                 && !projectsContains(reactorProjects, a)) {
                 throw new EnforcerRuleException(String.format(
-                    "Failure in parameter 'excludes'. Project '%s' not found in build", a));
+                    "Failure in parameter 'includes'. Project '%s' not found in build", a));
             }
         }
         if (includes.isEmpty()) {
             includes.add("*");
         }
 
+        getLog().debug(String.format("Parameter excludes.size: %d", excludes.size()));
         for (String a : excludes) {
             getLog().debug(String.format("Check exclude '%s'", a));
-            if (a == null || a.isEmpty() || a.matches("^[\t\n ]*$")) {
+            if (a == null) {
                 throw new EnforcerRuleException(
-                    "Failure in parameter 'includes'. String is null, empty or contains only whitespace");
+                    "Failure in parameter 'excludes'. String is null");
+            }
+            if (a.matches("^[\t\n ]+$")) {
+                throw new EnforcerRuleException(
+                    String.format("Failure in parameter 'excludes'. String contains only whitespace: '%s'", a));
             }
             List<String> ids = Arrays.asList(a.split(":"));
             if (ids.size() > 3) {
                 throw new EnforcerRuleException(
                     "Failure in parameter 'excludes'. String is invalid");
             }
-            if (errorIfUnknownProject && !a.contains("*")
+            /* If there is a wildcard, we cannot check if the project exists in the build.
+             * So we skip the check in this case.
+             */
+            if (TRUE.equals(errorIfUnknownProject) && !a.contains("*")
                 && !projectsContains(reactorProjects, a)) {
                 throw new EnforcerRuleException(String.format(
                     "Failure in parameter 'excludes'. Project '%s' not found in build", a));
             }
+        }
+
+        if (errorIfUnknownProject == null || errorIfUnknownProject.isEmpty()) {
+            errorIfUnknownProject = FALSE;
+        }
+        if (includeRootProject == null || includeRootProject.isEmpty()) {
+            includeRootProject = FALSE;
+        }
+        if (!TRUE.equals(errorIfUnknownProject) && !FALSE.equals(errorIfUnknownProject)) {
+            throw new EnforcerRuleException(
+                String.format("Failure in parameter 'errorIfUnknownProject'. Must be 'true' or 'false': '%s'", errorIfUnknownProject));
+        }
+        if (!TRUE.equals(includeRootProject) && !FALSE.equals(includeRootProject)) {
+            throw new EnforcerRuleException(
+                String.format("Failure in parameter 'includeRootProject'. Must be 'true' or 'false': '%s'", includeRootProject));
         }
 
         getLog().debug("includes(resolved)=" + includes);
@@ -312,7 +404,7 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
             getLog().debug("    " + projectId);
 
             if (isIncluded(project)) {
-                if (projectsAreEquals(project, currentProject) || (!this.includeRootProject
+                if (projectsAreEquals(project, currentProject) || (!TRUE.equals(this.includeRootProject)
                     && projectsAreEquals(project, mavenSession.getTopLevelProject()))) {
                     getLog().debug("Filter out project: "
                         + String.format("%s:%s", project.getGroupId(), project.getArtifactId()));
@@ -383,11 +475,11 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
     @Override
     public String toString() {
         return String.format(
-            "DependOnAllProjects[includes=%s;excludes=%s;includeRootProject=%b;errorIfUnknownProject=%b]",
+            "DependOnAllProjects[includes=%s;excludes=%s;includeRootProject=%s;errorIfUnknownProject=%s]",
             includes, excludes, includeRootProject, errorIfUnknownProject);
     }
 
-    private boolean isIncluded(MavenProject mavenProject) {
+    boolean isIncluded(MavenProject mavenProject) {
         boolean r = isProjectIncluded(this.includes, this.excludes, mavenProject);
         getLog().debug(String.format("isIncluded(%s:%s:%s:%s): %b", mavenProject.getGroupId(),
             mavenProject.getArtifactId(), mavenProject.getVersion(), mavenProject.getPackaging(),
