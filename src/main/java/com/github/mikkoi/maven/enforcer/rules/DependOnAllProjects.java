@@ -303,7 +303,9 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
         if ( (includes == null) || (includes.size() == 1 && "".equals(includes.get(0))) ) {
             includes = new ArrayList<>();
         }
-        if ( excludes == null || (excludes.size() == 1 && "".equals(excludes.get(0))) ) {
+        if (excludes == null) {
+            excludes = new ArrayList<>();
+        } else if (excludes.size() == 1 && "".equals(excludes.get(0))) {
             excludes = new ArrayList<>();
         }
         getLog().debug(String.format("Parameter includes.size: %d", includes.size()));
