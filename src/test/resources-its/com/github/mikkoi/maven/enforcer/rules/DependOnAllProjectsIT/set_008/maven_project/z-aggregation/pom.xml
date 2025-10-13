@@ -32,6 +32,7 @@
                                 <dependOnAllProjects>
                                     <!-- Add here all projects which do not have any code coverage reports ... -->
                                     <excludes>
+                                        <!-- Intentionally left as whitespace to test empty parameter validation -->
                                         <exclude>   </exclude>
                                     </excludes>
                                     <errorIfUnknownProject>true</errorIfUnknownProject>
