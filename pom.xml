@@ -408,6 +408,20 @@
 
                 <!-- Non-Maven -->
                 <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                    <version>2.18.0</version>
+                    <!-- Use from command line -->
+                    <configuration>
+                        <ignoredVersions>
+                            <ignoredVersion>.*-M.*</ignoredVersion>
+                            <ignoredVersion>.*-alpha.*</ignoredVersion>
+                            <ignoredVersion>.*-rc.*</ignoredVersion>
+                            <ignoredVersion>.*-beta.*</ignoredVersion>
+                        </ignoredVersions>
+                    </configuration>
+                </plugin>
+                <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>${jacoco.version}</version>

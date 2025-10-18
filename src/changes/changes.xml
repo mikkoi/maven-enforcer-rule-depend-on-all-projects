@@ -7,6 +7,9 @@
     </properties>
     <body>
         <release version="0.1.0" date="2999-12-31" description="Next minor release while moving towards version 1.0.0">
+            <action dev="mikkoi" type="add" date="2025-10-18">
+                Configure versions-maven-plugin for checking dependency updates.
+            </action>
             <action dev="mikkoi" type="update" date="2025-10-18">
                 Improve documentation.
             </action>
