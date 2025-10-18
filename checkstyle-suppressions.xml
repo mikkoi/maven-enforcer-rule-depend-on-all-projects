@@ -7,6 +7,7 @@
     <suppress files="." checks="LineLengthCheck"/>
     <suppress files="." checks="AvoidInlineConditionals"/>
     <suppress files="." checks="FinalParameters"/>
+    <suppress files="." checks="HiddenField"/>
 
     <!-- suppress TypeName checks on IT files, tolerate class 'set_001' -->
     <suppress files=".*IT.java" checks="TypeName"/>

@@ -6,6 +6,23 @@
         <author email="mikko.koivunalho@iki.fi">Mikko Koivunalho</author>
     </properties>
     <body>
+        <release version="0.1.0" date="2999-12-31" description="Next minor release while moving towards version 1.0.0">
+            <action dev="mikkoi" type="add" date="2025-10-18">
+                Add tests. Raise code coverage to 80%.
+            </action>
+            <action dev="mikkoi" type="add" date="2025-10-18">
+                Remove checkstyle violations and suppress HiddenField warnings.
+            </action>
+            <action dev="mikkoi" type="add" date="2025-10-18">
+                Configure maven-enforcer-plugin.
+            </action>
+            <action dev="mikkoi" type="add" date="2025-10-18">
+                Configure versions-maven-plugin for checking dependency updates.
+            </action>
+            <action dev="mikkoi" type="update" date="2025-10-18">
+                Improve documentation.
+            </action>
+        </release>
         <release version="0.0.16" date="2025-10-14" description="Subsequent patch release while moving towards version 1.0.0">
             <action dev="mikkoi" type="update" date="2025-10-14">
                 Rework Dependency Injection and add full rule unit test.

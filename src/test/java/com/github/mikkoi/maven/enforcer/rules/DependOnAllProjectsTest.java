@@ -115,4 +115,57 @@ class DependOnAllProjectsTest {
             "<dependency>\n  <groupId>com.github.mikkoi</groupId>\n  <artifactId>test-dependency</artifactId>\n</dependency>";
         assertThat(DependOnAllProjects.formatDependency(d1, "  ")).isEqualTo(e2);
     }
+
+    public static MavenProject createSimpleTestMavenProject(String groupId, String artifactId, String version, String packaging) {
+        final Model model = new Model();
+        model.setGroupId(groupId);
+        model.setArtifactId(artifactId);
+        model.setVersion(version);
+        model.setPackaging(packaging);
+        return new MavenProject(model);
+    }
+
+    public static Dependency createSimpleTestDependency(String groupId, String artifactId, String version, String type) {
+        final Dependency dependency = new Dependency();
+        dependency.setGroupId(groupId);
+        dependency.setArtifactId(artifactId);
+        dependency.setVersion(version);
+        dependency.setType(type);
+        return dependency;
+    }
+
+    @Test
+    void testProjectsAreEquals() {
+        MavenProject p1 = createSimpleTestMavenProject("com.example", "my-artifact", "1.0.0", "jar");
+        MavenProject p2 = createSimpleTestMavenProject("com.example", "my-artifact", "1.0.0", "jar");
+        MavenProject p3 = createSimpleTestMavenProject("com.example", "my-artifact", "1.0.0", "war");
+        MavenProject p4 = createSimpleTestMavenProject("com.example", "my-artifact", "1.1.0", "war");
+        MavenProject p5 = createSimpleTestMavenProject("com.example", "my-artifact-1", "1.1.0", "war");
+        MavenProject p6 = createSimpleTestMavenProject("com.example.one", "my-artifact-1", "1.1.0", "war");
+
+        assertThat(DependOnAllProjects.projectsAreEquals(p1, p2)).isTrue();
+        assertThat(DependOnAllProjects.projectsAreEquals(p1, p3)).isFalse();
+        assertThat(DependOnAllProjects.projectsAreEquals(p3, p4)).isFalse();
+        assertThat(DependOnAllProjects.projectsAreEquals(p4, p5)).isFalse();
+        assertThat(DependOnAllProjects.projectsAreEquals(p5, p6)).isFalse();
+    }
+
+    @Test
+    void testDependenciesContains() {
+        Dependency d1 = createSimpleTestDependency("com.example", "my-artifact", "1.0.0", "jar");
+        Dependency d2 = createSimpleTestDependency("com.example", "my-artifact", "1.0.0", "jar");
+        Dependency d3 = createSimpleTestDependency("com.example", "my-artifact", "1.0.0", "war");
+        Dependency d4 = createSimpleTestDependency("com.example", "my-artifact", "1.1.0", "war");
+
+        MavenProject p1 = createSimpleTestMavenProject("com.example", "my-artifact", "1.0.0", "jar");
+        MavenProject p2 = createSimpleTestMavenProject("com.example.two", "my-artifact", "1.0.0", "jar");
+
+        List<Dependency> dependencies = new ArrayList<>();
+        dependencies.add(d1);
+        dependencies.add(d2);
+        dependencies.add(d3);
+        dependencies.add(d4);
+        assertThat(DependOnAllProjects.dependenciesContains(dependencies, p1)).isTrue();
+        assertThat(DependOnAllProjects.dependenciesContains(dependencies, p2)).isFalse();
+    }
 }

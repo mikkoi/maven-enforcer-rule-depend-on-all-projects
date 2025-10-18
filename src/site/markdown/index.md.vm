@@ -5,21 +5,21 @@ Maven Enforcer Rule dependOnAllProjects
 provides [rules](https://maven.apache.org/enforcer/enforcer-rules/index.html)
 to control environmental and configurational constraints such as Maven version,
 JDK version, OS family, existence or non-existence of files and Maven profiles or properties.
-The are also many [custom rules](https://maven.apache.org/enforcer/maven-enforcer-plugin/thirdparty-rules.html)
+There are also many [custom rules](https://maven.apache.org/enforcer/enforcer-api/writing-a-custom-rule.html)
 created by users or third parties.
 
 ${project.name}, `${project.groupId}:${project.artifactId}`
-is a user created [custom rule](http://maven.apache.org/enforcer/enforcer-api/writing-a-custom-rule.html)
+is a user-created [custom rule](http://maven.apache.org/enforcer/enforcer-api/writing-a-custom-rule.html)
 to force any Maven project in a multimodule build to have a dependency on all other projects in the same build.
 
 Use Cases
 ---------
 
-There is one general use case for this functionality and also one very specific use case.
-The rule ensures that when a multimodule Maven project is reconfigured with adding or removing subprojects,
-all projects are listed as dependencies for the subproject where
+There is one general use case and one specific use case.
+The rule ensures that when a multimodule Maven project is reconfigured by adding or removing subprojects,
+all projects are listed as dependencies for that subproject in which
 `maven-enforcer-plugin` is executed. If used in a CI pipeline or in any similar manner,
-this Maven Enforcer rule will keep the subproject up-to-date.
+this Maven Enforcer rule will keep the subproject up to date.
 
 General Use Case
 ----------------
@@ -30,18 +30,23 @@ it can be placed into its own subproject with `maven-enforcer-plugin` configured
 Jacoco Use Case
 ---------------
 
-[Jacoco](https://www.jacoco.org/jacoco/) is a free Java code coverage library.
-When used in a multimodule project, after building and running tests for all those
-subproject which contain source code, the build must execute
-[jacoco:report-aggregate](https://www.jacoco.org/jacoco/trunk/doc/report-aggregate-mojo.html).
+[JaCoCo](https://www.jacoco.org/jacoco/) is a free Java code coverage library.
+When used in a multimodule project, after building and running tests for all subprojects that contain source code,
+the build must execute [jacoco:report-aggregate](https://www.jacoco.org/jacoco/trunk/doc/report-aggregate-mojo.html).
 
-This creates a structured code coverage report (HTML, XML, and CSV) from multiple projects within
+This creates a structured (code coverage)[https://en.wikipedia.org/wiki/Code_coverage]
+report (HTML, XML, and CSV) from multiple projects within
 [Maven reactor](https://maven.apache.org/guides/mini/guide-multiple-modules.html).
-The report is created from all modules that the project depends on, and optionally that subproject itself.
-From those projects class and source files as well as JaCoCo execution data files will be collected.
-In addition execution data is collected from the project itself.
-This also allows to create coverage reports when tests are in separate projects than the code under test,
-for example in case of integration tests.
+The aggregated report is generated from all subprojects that the project depends on, and optionally from the subproject itself.
+The class and source files, as well as JaCoCo execution data files, will be collected from those projects.
 
-With ${project.name} the subproject can ensure that all other subprojects are indeed
-listed as its dependencies, or exceptions are configured properly.
+In addition, execution data is collected from the project itself, if there is any.
+This also allows creating coverage reports when tests are in separate projects from the code under test,
+for example when integration tests live in a different module.
+
+With ${project.name}, the subproject can ensure that all other subprojects are indeed
+listed as its dependencies, or that exceptions are configured properly.
+
+Please refer to the Jacoco documentation for more details on how to configure
+the `jacoco-maven-plugin:report-aggregate` goal:
+https://www.jacoco.org/jacoco/trunk/doc/report-aggregate-mojo.html

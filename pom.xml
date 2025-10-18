@@ -4,7 +4,7 @@
 
     <groupId>com.github.mikkoi</groupId>
     <artifactId>maven-enforcer-rule-depend-on-all-projects</artifactId>
-    <version>0.0.17-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Maven Enforcer Rule dependOnAllProjects</name>
     <description>Custom rule for Maven Enforcer to require all other subprojects of the build are defined as dependencies.</description>
@@ -119,7 +119,6 @@
                 <groupId>org.apache.maven.enforcer</groupId>
                 <artifactId>enforcer-api</artifactId>
                 <version>${maven-enforcer-api.version}</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>
@@ -408,6 +407,20 @@
 
                 <!-- Non-Maven -->
                 <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                    <version>2.18.0</version>
+                    <!-- Use from command line -->
+                    <configuration>
+                        <ignoredVersions>
+                            <ignoredVersion>.*-M.*</ignoredVersion>
+                            <ignoredVersion>.*-alpha.*</ignoredVersion>
+                            <ignoredVersion>.*-rc.*</ignoredVersion>
+                            <ignoredVersion>.*-beta.*</ignoredVersion>
+                        </ignoredVersions>
+                    </configuration>
+                </plugin>
+                <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>${jacoco.version}</version>
@@ -461,6 +474,45 @@
         </pluginManagement>
 
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <configuration>
+                    <rules>
+                        <banDependencyManagementScope>true</banDependencyManagementScope>
+                        <banDuplicatePomDependencyVersions>true</banDuplicatePomDependencyVersions>
+                        <banDynamicVersions>true</banDynamicVersions>
+                        <dependencyConvergence/>
+                        <requireMavenVersion>
+                            <version>[3.6.3,)</version>
+                        </requireMavenVersion>
+                        <requireJavaVersion>
+                            <version>[${java.version},)</version>
+                        </requireJavaVersion>
+                        <requireReleaseDeps/>
+                        <requireSameVersions>
+                            <plugins>
+                                <plugin>org.apache.maven.plugins:maven-surefire-plugin</plugin>
+                                <plugin>org.apache.maven.plugins:maven-failsafe-plugin</plugin>
+                                <plugin>org.apache.maven.plugins:maven-surefire-report-plugin</plugin>
+                            </plugins>
+                        </requireSameVersions>
+                        <requireSameVersions>
+                            <dependencies>
+                                <dependency>org.apache.maven</dependency>
+                            </dependencies>
+                        </requireSameVersions>
+                    </rules>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
