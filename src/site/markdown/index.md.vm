@@ -36,7 +36,7 @@ the build must execute [jacoco:report-aggregate](https://www.jacoco.org/jacoco/t
 
 This creates a structured (code coverage)[https://en.wikipedia.org/wiki/Code_coverage]
 report (HTML, XML, and CSV) from multiple projects within
-[Maven Reactor](https://maven.apache.org/guides/mini/guide-multiple-modules.html).
+[Maven reactor](https://maven.apache.org/guides/mini/guide-multiple-modules.html).
 The aggregated report is generated from all subprojects that the project depends on, and optionally from the subproject itself.
 The class and source files, as well as JaCoCo execution data files, will be collected from those projects.
 
