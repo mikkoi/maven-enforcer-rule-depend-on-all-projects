@@ -1,7 +1,7 @@
 Configuration
 =============
 
-Enforcer rule `${project.artifactId}` has the following configuration parameters:
+The enforcer rule `${project.artifactId}` has the following configuration parameters:
 
 * `<includes>`
 
@@ -17,8 +17,10 @@ Example:
 * `<excludes>`
 
 Exclude these projects. If both `<includes>` and `<excludes>` are defined,
-then `<includes>` are used to filter in, and then `<excludes>` are excluded from
-those already picked.
+then `<includes>` are used to select projects, and `<excludes>` are applied
+to remove projects from that selection.
+
+Example:
 
     <excludes>
         <exclude>project-excluded</exclude>
@@ -30,7 +32,7 @@ those already picked.
 
 Default: false
 
-Set to true to include the root project in the dependencies.
+Set to `true` to include the root project in the dependencies.
 
     <includeRootProject>true</includeRootProject>
 
@@ -38,10 +40,9 @@ Set to true to include the root project in the dependencies.
 
 Default: false
 
-If there is a full project name (groupId and artifactId) in includes or excludes,
-and that project is not among the
-[Maven reactor](https://maven.apache.org/guides/mini/guide-multiple-modules.html)
-projects, break build with an error.
-This will prevent outdated configuration.
+If a full project name (groupId and artifactId) is used in `<includes>` or `<excludes>`,
+and the referenced project is not part of the
+[Maven reactor](https://maven.apache.org/guides/mini/guide-multiple-modules.html),
+the build fails with an error. This helps prevent outdated configuration.
 
     <errorIfUnknownProject>true</errorIfUnknownProject>

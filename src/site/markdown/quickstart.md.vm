@@ -1,79 +1,66 @@
-Quickstart Guide
-================
+Quickstart
+==========
 
-Configuring the plugin
-----------------------
+This quickstart shows how to configure the Maven Enforcer Plugin to use the `${project.artifactId}` rule in a multimodule build.
 
-Add the following in the `<plugins>` list of your project's `pom.xml` file:
+Prerequisites
+-------------
 
-    <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <dependencies>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>${project.artifactId}</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-        </dependencies>
-        <executions>
-            <execution>
-                <id>depend-on-all-projects</id>
-                <phase>validate</phase>
-                <goals>
-                    <goal>enforce</goal>
-                </goals>
-                <configuration>
-                    <rules>
-                        <dependOnAllProjects/>
-                    </rules>
-                </configuration>
-            </execution>
-        </executions>
-    </plugin>
+1. Maven 3.x or later.
+2. The rule artifact installed in your local repository or available from a remote repository.
 
-Another configuration example with separate `<pluginManagement>` definition:
+Usage
+-----
 
-    <project>
-        <build>
-            <pluginManagement>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-enforcer-plugin</artifactId>
-                        <version>3.6.1</version>
-                        <dependencies>
-                            <dependency>
-                                <groupId>com.github.mikkoi</groupId>
-                                <artifactId>maven-enforcer-rule-depend-on-all-projects</artifactId>
-                                <version>@project.version@</version>
-                            </dependency>
-                        </dependencies>
-                    </plugin>
-                </plugins>
-            </pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-enforcer-plugin</artifactId>
+1. Add the Maven Enforcer Plugin to the project where you want to enforce the rule.
+2. Configure the rule inside the plugin configuration.
+3. Run the Enforcer Plugin during your build or call it manually.
+
+Example configuration
+---------------------
+
+Add the following snippet to the `build` section of the POM where you want the rule to run:
+
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-enforcer-plugin</artifactId>
+            <version>3.1.0</version>
+            <executions>
+                <execution>
+                    <id>enforce-dependencies</id>
+                    <goals>
+                        <goal>enforce</goal>
+                    </goals>
                     <configuration>
                         <rules>
-                            <dependOnAllProjects>
-                                <!-- Include all projects with same groupId -->
-                                <!-- except pom projects and one web application -->
-                                <includes>
-                                    <include>com.github.mikkoi:*</include>
-                                </includes>
-                                <excludes>
-                                    <exclude>com.github.mikkoi:*:pom</exclude>
-                                    <exclude>com.github.mikkoi:not-me:war</exclude>
-                                </excludes>
+                            <dependOnAllProjects implementation="${project.groupId}:${project.artifactId}:${project.version}">
+                                <includeRootProject>false</includeRootProject>
+                                <errorIfUnknownProject>false</errorIfUnknownProject>
                             </dependOnAllProjects>
                         </rules>
+                        <fail>true</fail>
                     </configuration>
-                </plugin>
-            </plugins>
-        </build>
-    </project>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
 
-To know more about plugin's configuration and parameters check the [mojo page](usage.html).
+Run the rule
+------------
+
+Execute the rule with:
+
+    mvn enforcer:enforce
+
+Or run the full build to execute the plugin as part of the lifecycle:
+
+    mvn verify
+
+Notes
+-----
+
+1. By default, all reactor projects are considered unless `includes` or `excludes` are specified.
+2. Use the `includes` and `excludes` configuration parameters to control which projects are required as dependencies.
+3. Set `includeRootProject` to `true` to include the root project in the dependency list.
+4. Enable `errorIfUnknownProject` to fail the build when an include or exclude references a project not present in the current reactor.
