@@ -101,6 +101,18 @@ class DependOnAllProjectsRuleTest {
             + "errorIfUnknownProject=false"
             + "]");
 
+        rule.setExcludes(null);
+        rule.setIncludes(null);
+        rule.setErrorIfUnknownProject(null);
+        rule.setIncludeRootProject(null);
+        rule.validateAndPrepareParameters();
+        assertThat(rule).hasToString("DependOnAllProjects["
+            + "includes=[*];"
+            + "excludes=[];"
+            + "includeRootProject=false;"
+            + "errorIfUnknownProject=false"
+            + "]");
+
         final List<String> includes = new ArrayList<>();
         includes.add("*");
         includes.add("com.github.mikkoi:*");
