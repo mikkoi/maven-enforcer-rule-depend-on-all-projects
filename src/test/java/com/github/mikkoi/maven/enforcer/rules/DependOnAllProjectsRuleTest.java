@@ -1,6 +1,8 @@
 package com.github.mikkoi.maven.enforcer.rules;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
 import org.apache.maven.enforcer.rule.api.EnforcerLogger;
 import org.apache.maven.enforcer.rule.api.EnforcerRuleException;
@@ -134,6 +136,24 @@ class DependOnAllProjectsRuleTest {
         rule.setExcludes(excludes);
         assertThat(rule.isIncluded(projectA)).isFalse();
         assertThat(rule.isIncluded(projectB)).isFalse();
+
+        includes.clear();
+        includes.add("com.github:*");
+        excludes.clear();
+        excludes.add("com.github.mikkoi:test-artifact-a");
+        excludes.add("com.github.mikkoi:test-artifact-b");
+        rule.setIncludes(includes);
+        rule.setExcludes(excludes);
+        assertThatNoException().isThrownBy(rule::execute);
+
+        includes.clear();
+        excludes.clear();
+        rule.setIncludes(includes);
+        rule.setExcludes(excludes);
+        assertThatExceptionOfType(EnforcerRuleException.class)
+            .isThrownBy(rule::execute)
+            .withMessageContaining("Project 'com.github.mikkoi:test-artifact' is missing dependency 'com.github.mikkoi:test-artifact-a:jar'.\n"
+                + "Project 'com.github.mikkoi:test-artifact' is missing dependency 'com.github.mikkoi:test-artifact-b:jar'.");
     }
 
 }
