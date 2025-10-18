@@ -119,7 +119,6 @@
                 <groupId>org.apache.maven.enforcer</groupId>
                 <artifactId>enforcer-api</artifactId>
                 <version>${maven-enforcer-api.version}</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>
@@ -485,7 +484,7 @@
                         <banDynamicVersions>true</banDynamicVersions>
                         <dependencyConvergence/>
                         <requireMavenVersion>
-                            <version>[3.6.3)</version>
+                            <version>[3.6.3,)</version>
                         </requireMavenVersion>
                         <requireJavaVersion>
                             <version>[${java.version},)</version>
@@ -500,10 +499,19 @@
                         </requireSameVersions>
                         <requireSameVersions>
                             <dependencies>
-                                <dependency>org.apache.maven</dependency> <!-- or org.apache.maven:* -->
+                                <dependency>org.apache.maven</dependency>
                             </dependencies>
-                        </requireSameVersions>                    </rules>
+                        </requireSameVersions>
+                    </rules>
                 </configuration>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
