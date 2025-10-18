@@ -10,7 +10,7 @@
     </skin>
     <custom>
         <fluidoSkin>
-            <profile>pre-release</profile>
+            <profile>production</profile>
             <topBarEnabled>false</topBarEnabled>
             <sideBarEnabled>true</sideBarEnabled>
             <sourceLineNumbersEnabled>true</sourceLineNumbersEnabled>
