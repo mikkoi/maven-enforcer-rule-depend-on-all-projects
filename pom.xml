@@ -477,6 +477,36 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <configuration>
+                    <rules>
+                        <banDependencyManagementScope>true</banDependencyManagementScope>
+                        <banDuplicatePomDependencyVersions>true</banDuplicatePomDependencyVersions>
+                        <banDynamicVersions>true</banDynamicVersions>
+                        <dependencyConvergence/>
+                        <requireMavenVersion>
+                            <version>[3.6.3)</version>
+                        </requireMavenVersion>
+                        <requireJavaVersion>
+                            <version>[${java.version},)</version>
+                        </requireJavaVersion>
+                        <requireReleaseDeps/>
+                        <requireSameVersions>
+                            <plugins>
+                                <plugin>org.apache.maven.plugins:maven-surefire-plugin</plugin>
+                                <plugin>org.apache.maven.plugins:maven-failsafe-plugin</plugin>
+                                <plugin>org.apache.maven.plugins:maven-surefire-report-plugin</plugin>
+                            </plugins>
+                        </requireSameVersions>
+                        <requireSameVersions>
+                            <dependencies>
+                                <dependency>org.apache.maven</dependency> <!-- or org.apache.maven:* -->
+                            </dependencies>
+                        </requireSameVersions>                    </rules>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <source>${java.version}</source>
