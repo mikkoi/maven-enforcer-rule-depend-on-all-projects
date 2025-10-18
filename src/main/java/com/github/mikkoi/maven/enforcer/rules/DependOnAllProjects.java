@@ -24,14 +24,20 @@ import java.util.function.Predicate;
 public class DependOnAllProjects extends AbstractEnforcerRule {
 
     /**
-     * Constant value
-     * Size of indentation inside a &lt;dependency>&gt; definition.
+     * Constant value: Size of indentation inside a &lt;dependency>&gt; definition.
      */
     private static final String INDENT_DEPENDENCY = "    ";
     /**
-     * Constant values for faking boolean parameters.
+     * Constant value: Maximum number of parts in a dependency declaration.
+     */
+    private static final int MAX_NUM_PARTS_IN_DEPENDENCY_DECLARATION = 3;
+    /**
+     * Constant value for faking boolean parameter false.
      */
     private static final String FALSE = "false";
+    /**
+     * Constant value for faking boolean parameter true.
+     */
     private static final String TRUE = "true";
     /**
      * Inject needed Maven component.
@@ -78,7 +84,7 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
      */
     @Inject
     public void setIncludes(@Nullable List<String> includes) {
-        if ( includes == null ) {
+        if (includes == null) {
             this.includes = new ArrayList<>();
         } else {
             this.includes = new ArrayList<>(includes);
@@ -91,7 +97,7 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
      */
     @Inject
     public void setExcludes(@Nullable List<String> excludes) {
-        if ( excludes == null ) {
+        if (excludes == null) {
             this.excludes = new ArrayList<>();
         } else {
             this.excludes = new ArrayList<>(excludes);
@@ -104,7 +110,7 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
      */
     @Inject
     public void setErrorIfUnknownProject(String errorIfUnknownProject) {
-        if ( errorIfUnknownProject != null ) {
+        if (errorIfUnknownProject != null) {
             this.errorIfUnknownProject = errorIfUnknownProject;
         } else {
             this.errorIfUnknownProject = FALSE;
@@ -117,7 +123,7 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
      */
     @Inject
     public void setIncludeRootProject(String includeRootProject) {
-        if ( includeRootProject != null ) {
+        if (includeRootProject != null) {
             this.includeRootProject = includeRootProject;
         } else {
             this.includeRootProject = FALSE;
@@ -160,7 +166,7 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
         if (!t.contains(":")) {
             t = ".*:" + t + ":.*";
         }
-        if (Arrays.stream(t.split(":")).count() < 3) {
+        if (Arrays.stream(t.split(":")).count() < MAX_NUM_PARTS_IN_DEPENDENCY_DECLARATION) {
             t = t + ":.*";
         }
         return t;
@@ -232,7 +238,7 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
                     return true;
                 }
             } else {
-                assert ids.size() == 3;
+                assert ids.size() == MAX_NUM_PARTS_IN_DEPENDENCY_DECLARATION;
                 if (project.getGroupId().equals(ids.get(0))
                     && project.getArtifactId().equals(ids.get(1))
                     && project.getPackaging().equals(ids.get(2))) {
@@ -300,7 +306,7 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
          * if the parameter is not set. So we need to check for this case and convert it to an empty list.
          * Then we can add the default value of "*".
          */
-        if ( (includes == null) || (includes.size() == 1 && "".equals(includes.get(0))) ) {
+        if ((includes == null) || (includes.size() == 1 && "".equals(includes.get(0)))) {
             includes = new ArrayList<>();
         }
         if (excludes == null) {
@@ -320,7 +326,7 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
                     String.format("Failure in parameter 'includes'. String contains only whitespace: '%s'", a));
             }
             List<String> ids = Arrays.asList(a.split(":"));
-            if (ids.size() > 3) {
+            if (ids.size() > MAX_NUM_PARTS_IN_DEPENDENCY_DECLARATION) {
                 throw new EnforcerRuleException(
                     "Failure in parameter 'includes'. String is invalid");
             }
@@ -349,7 +355,7 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
                     String.format("Failure in parameter 'excludes'. String contains only whitespace: '%s'", a));
             }
             List<String> ids = Arrays.asList(a.split(":"));
-            if (ids.size() > 3) {
+            if (ids.size() > MAX_NUM_PARTS_IN_DEPENDENCY_DECLARATION) {
                 throw new EnforcerRuleException(
                     "Failure in parameter 'excludes'. String is invalid");
             }
@@ -481,6 +487,12 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
             includes, excludes, includeRootProject, errorIfUnknownProject);
     }
 
+    /**
+     * Decide if the project is included or excluded.
+     *
+     * @param mavenProject MavenProject
+     * @return true if included, false if excluded
+     */
     boolean isIncluded(MavenProject mavenProject) {
         boolean r = isProjectIncluded(this.includes, this.excludes, mavenProject);
         getLog().debug(String.format("isIncluded(%s:%s:%s:%s): %b", mavenProject.getGroupId(),
