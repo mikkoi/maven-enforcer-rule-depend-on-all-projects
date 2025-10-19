@@ -11,8 +11,9 @@ name: Java CI with Maven
 on:
   pull_request:
   workflow_dispatch:
-
-
+  push:
+    # There are no pull requests to main, only merges, so we need to build on push to main as well
+    branches: [ "main" ]
 jobs:
   build:
     runs-on: ubuntu-latest
