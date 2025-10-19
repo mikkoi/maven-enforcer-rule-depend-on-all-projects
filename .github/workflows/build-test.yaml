@@ -15,7 +15,7 @@ on:
     # There are no pull requests to main, only merges, so we need to build on push to main as well
     branches: [ "main" ]
 jobs:
-  build:
+  build_and_test:
     runs-on: ubuntu-latest
     steps:
       - id: checkout-repository
@@ -32,12 +32,12 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
           cache: 'maven'
-      - id: build
+      - id: build-and-test
         name: Build with Maven
+        shell: bash
         run: |
           mvn                                                                  \
               --batch-mode                                                     \
-              --fail-never                                                     \
               --file pom.xml                                                   \
               install                                                          \
             && true
@@ -49,7 +49,6 @@ jobs:
         run: |
           mvn \
               --batch-mode                                                     \
-              --fail-never                                                     \
               -Dsonar.token="${SONAR_TOKEN}"                                   \
               org.sonarsource.scanner.maven:sonar-maven-plugin:sonar           \
           && true
