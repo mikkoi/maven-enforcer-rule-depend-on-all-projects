@@ -42,6 +42,9 @@ jobs:
             && true
       - id: report-to-sonarqube
         name: Report to SonarQube
+        shell: bash
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           mvn \
               --batch-mode                                                     \
@@ -49,8 +52,6 @@ jobs:
               -Dsonar.token="${SONAR_TOKEN}"                                   \
               org.sonarsource.scanner.maven:sonar-maven-plugin:sonar           \
           && true
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
       #- name: Update dependency graph

@@ -56,14 +56,16 @@ jobs:
           gpg-passphrase: 'MAVEN_GPG_PASSPHRASE'
       - id: amend-git-config
         name: Amend Git Config
+        env:
+          PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         shell: bash
-        # This necessary because of error during site publish (scm-publish to gh-pages):
+        # Setting crlf is necessary because of error during site publish (scm-publish to gh-pages):
         # Failed to add new files to SCM: The git-add command failed.
         #   fatal: CRLF would be replaced by LF in fonts/glyphicons-halflings-regular.svg
         run: |
           git config --global core.autocrlf false
           git config --global core.safecrlf false
-          git config --global url.https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/.insteadOf https://github.com/
+          git config --global "url.https://${PERSONAL_ACCESS_TOKEN}@github.com/.insteadOf" https://github.com/
       - id: release-prepare
         name: Create And Commit Release Commits
         shell: bash

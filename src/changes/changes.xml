@@ -6,6 +6,11 @@
         <author email="mikko.koivunalho@iki.fi">Mikko Koivunalho</author>
     </properties>
     <body>
+        <release version="0.1.2" date="2025-10-19" description="Next patch release while moving towards version 1.0.0">
+            <action dev="mikkoi" type="add" date="2025-10-19">
+                Harden GitHub Actions workflow by putting secrets into environment variables.
+            </action>
+        </release>
         <release version="0.1.1" date="2025-10-18" description="Next patch release while moving towards version 1.0.0">
             <action dev="mikkoi" type="add" date="2025-10-18">
                 Move site skin from pre-release profile to production profile. Removes pre-release "watermark".
