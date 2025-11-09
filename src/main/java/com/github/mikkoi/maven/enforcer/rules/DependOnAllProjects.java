@@ -253,7 +253,7 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
             return project.getGroupId().equals(ids.get(0))
                 && project.getArtifactId().equals(ids.get(1));
         } else {
-            // ids.size() == MAX_NUM_PARTS_IN_DEPENDENCY_DECLARATION;
+            // ids.size() is MAX_NUM_PARTS_IN_DEPENDENCY_DECLARATION;
             return project.getGroupId().equals(ids.get(0))
                 && project.getArtifactId().equals(ids.get(1))
                 && project.getPackaging().equals(ids.get(2));
