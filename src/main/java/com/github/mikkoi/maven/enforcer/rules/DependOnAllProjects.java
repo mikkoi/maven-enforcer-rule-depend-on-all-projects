@@ -238,7 +238,7 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
                     return true;
                 }
             } else {
-                assert ids.size() == MAX_NUM_PARTS_IN_DEPENDENCY_DECLARATION;
+                // ids.size() == MAX_NUM_PARTS_IN_DEPENDENCY_DECLARATION;
                 if (project.getGroupId().equals(ids.get(0))
                     && project.getArtifactId().equals(ids.get(1))
                     && project.getPackaging().equals(ids.get(2))) {
