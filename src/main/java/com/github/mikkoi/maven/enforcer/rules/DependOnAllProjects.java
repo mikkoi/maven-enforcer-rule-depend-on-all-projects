@@ -222,7 +222,7 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
      * Attn. No wildcards are supported in projectName.
      *
      * @param projects    Iterable of MavenProject objects
-     * @param projectName Project name, e.g. "artifactId", "groupId:artifactId", "groupId:artifactId:packingType".
+     * @param projectName Project name, e.g. "artifactId", "groupId:artifactId", "groupId:artifactId:packagingType".
      * @return Boolean
      */
     public static boolean projectsContains(Iterable<MavenProject> projects, String projectName) {
@@ -242,7 +242,7 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
      * Attn. No wildcards are supported here.
      *
      * @param project           MavenProject object
-     * @param projectDefinition Project name, e.g. "artifactId", "groupId:artifactId", "groupId:artifactId:packingType".
+     * @param projectDefinition Project name, e.g. "artifactId", "groupId:artifactId", "groupId:artifactId:packagingType".
      * @return Boolean
      */
     public static boolean projectMatchesWithDefinition(MavenProject project, String projectDefinition) {
