@@ -7,6 +7,9 @@
     </properties>
     <body>
         <release version="1.0.1-SNAPSHOT" date="2025-10-19" description="Next patch release while moving towards version 1.1.0">
+            <action dev="mikkoi" type="add" date="2025-11-09">
+                Add License link to site menu.
+            </action>
         </release>
         <release version="1.0.0" date="2025-10-19" description="Moving towards version 1.0.0">
         </release>
