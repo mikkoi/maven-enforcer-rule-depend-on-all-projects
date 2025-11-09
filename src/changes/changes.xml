@@ -6,6 +6,8 @@
         <author email="mikko.koivunalho@iki.fi">Mikko Koivunalho</author>
     </properties>
     <body>
+        <release version="1.0.1-SNAPSHOT" date="2025-10-19" description="Next patch release while moving towards version 1.1.0">
+        </release>
         <release version="1.0.0" date="2025-10-19" description="Moving towards version 1.0.0">
         </release>
         <release version="0.1.2" date="2025-10-19" description="Next patch release while moving towards version 1.0.0">
