@@ -7,6 +7,9 @@
     </properties>
     <body>
         <release version="0.1.2" date="2025-10-19" description="Next patch release while moving towards version 1.0.0">
+            <action dev="mikkoi" type="add" date="2025-11-09">
+                Raise code coverage to 90%.
+            </action>
             <action dev="mikkoi" type="add" date="2025-10-19">
                 Remove parameter --fail-never from GitHub Actions workflow. It hides failures.
             </action>
