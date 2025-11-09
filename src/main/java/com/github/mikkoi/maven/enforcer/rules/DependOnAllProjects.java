@@ -423,6 +423,7 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
             getLog().debug("    " + projectId);
 
             if (isIncluded(project)) {
+                // Filter out current project and optionally root project (if includeRootProject is false)
                 if (projectsAreEquals(project, currentProject) || (!TRUE.equals(this.includeRootProject)
                     && projectsAreEquals(project, mavenSession.getTopLevelProject()))) {
                     getLog().debug("Filter out project: "

@@ -11,6 +11,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
 import org.mockito.Mockito;
 
+import java.util.Collection;
 import java.util.Collections;
 
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -30,6 +31,28 @@ import java.util.List;
  * In this test class, we create a complete dependOnAllProjects rule instance.
  */
 class DependOnAllProjectsRuleTest {
+
+    public static Dependency createDependency(String groupId, String artifactId, String version, String type, String scope) {
+        final Dependency dependency = new Dependency();
+        dependency.setGroupId(groupId);
+        dependency.setArtifactId(artifactId);
+        dependency.setVersion(version);
+        dependency.setType(type);
+        dependency.setScope(scope);
+        return dependency;
+    }
+
+    public static MavenProject createTestMavenProjectWithDependencies(String groupId, String artifactId, String version, String packaging, Collection<Dependency> dependencies) {
+        final Model model = new Model();
+        model.setGroupId(groupId);
+        model.setArtifactId(artifactId);
+        model.setVersion(version);
+        model.setPackaging(packaging);
+        for (Dependency dependency : dependencies) {
+            model.addDependency(dependency);
+        }
+        return new MavenProject(model);
+    }
 
     public static MavenProject createTestMavenProject() {
         final Model model = new Model();
@@ -88,6 +111,33 @@ class DependOnAllProjectsRuleTest {
     public static EnforcerLogger createTestLogger() {
         return Mockito.mock(EnforcerLogger.class);
     }
+
+    public static ProjectDependencyGraph createTestProjectDependencyGraph(List<MavenProject> sortedProjects) {
+        return new ProjectDependencyGraph() {
+            @Override
+            public List<MavenProject> getAllProjects() {
+                return new ArrayList<>();
+            }
+
+            @Override
+            public List<MavenProject> getSortedProjects() {
+                return sortedProjects;
+            }
+
+            @Override
+            public List<MavenProject> getDownstreamProjects(MavenProject project,
+                                                            boolean transitive) {
+                return new ArrayList<>();
+            }
+
+            @Override
+            public List<MavenProject> getUpstreamProjects(MavenProject project,
+                                                          boolean transitive) {
+                return new ArrayList<>();
+            }
+        };
+    }
+
     @Test
     void testProjectsContains2() throws EnforcerRuleException {
         final MavenSession mavenSession = createTestMavenSession();
@@ -166,6 +216,72 @@ class DependOnAllProjectsRuleTest {
             .isThrownBy(rule::execute)
             .withMessageContaining("Project 'com.github.mikkoi:test-artifact' is missing dependency 'com.github.mikkoi:test-artifact-a:jar'.\n"
                 + "Project 'com.github.mikkoi:test-artifact' is missing dependency 'com.github.mikkoi:test-artifact-b:jar'.");
-    }
 
+        // We create our own ProjectDependencyGraph...
+        // In this case, the reactor contains proj-a, proj-b and proj-z (aggregate)
+        // The root project depends on proj-a, proj-b and proj-z
+        // The current project is proj-z, and it depends on all projects, including the root project
+        // (which setup is a bit odd, but should be supported)
+        //
+        final Dependency dependencyProjA = createDependency(
+            "com.github.mikkoi", "proj-a", "1.0.0", "jar", "compile"
+        );
+        final Dependency dependencyProjB = createDependency(
+            "com.github.mikkoi", "proj-b", "1.0.0", "jar", "compile"
+        );
+        final Dependency dependencyProjZ = createDependency(
+            "com.github.mikkoi", "proj-z", "1.0.0", "pom", "compile"
+        );
+        final Dependency dependencyProjRoot = createDependency(
+            "com.github.mikkoi", "proj-root", "1.0.0", "pom", "compile"
+        );
+
+        final List<Dependency> projRootDependencies = new ArrayList<>();
+        projRootDependencies.add(dependencyProjA);
+        projRootDependencies.add(dependencyProjB);
+        projRootDependencies.add(dependencyProjZ);
+        final List<Dependency> projZDependencies = new ArrayList<>();
+        projZDependencies.add(dependencyProjA);
+        projZDependencies.add(dependencyProjB);
+        projZDependencies.add(dependencyProjRoot);
+
+        MavenProject mavenProjectA = createTestMavenProjectWithDependencies(
+            "com.github.mikkoi", "proj-a", "1.0.0", "jar", new ArrayList<>()
+        );
+        MavenProject mavenProjectB = createTestMavenProjectWithDependencies(
+            "com.github.mikkoi", "proj-b", "1.0.0", "jar", new ArrayList<>()
+        );
+        MavenProject mavenProjectZ = createTestMavenProjectWithDependencies(
+            "com.github.mikkoi", "proj-z", "1.0.0", "pom", projZDependencies
+        );
+        MavenProject mavenProjectRoot = createTestMavenProjectWithDependencies(
+            "com.github.mikkoi", "proj-root", "1.0.0", "pom", projRootDependencies
+        );
+        // List of projects in the reactor build in topological (sorted) order
+        // in which they should be built.
+        final List<MavenProject> projects = new ArrayList<>();
+        projects.add(mavenProjectA);
+        projects.add(mavenProjectB);
+        projects.add(mavenProjectZ);
+        // The root project depends on proj-a, proj-b and proj-z
+        projects.add(mavenProjectRoot);
+
+        ProjectDependencyGraph projectDependencyGraph = createTestProjectDependencyGraph(projects);
+        mavenSession.setProjectDependencyGraph(projectDependencyGraph);
+        mavenSession.setCurrentProject(mavenProjectZ);
+        assertThatNoException().isThrownBy(rule::execute);
+
+        // Now, we remove proj-root from proj-z dependencies
+        projZDependencies.clear();
+        projZDependencies.add(dependencyProjA);
+        projZDependencies.add(dependencyProjB);
+        projects.set(2, createTestMavenProjectWithDependencies(
+            "com.github.mikkoi", "proj-z", "1.0.0", "pom", projZDependencies
+        ));
+        mavenSession.setProjectDependencyGraph(createTestProjectDependencyGraph(projects));
+        mavenSession.setCurrentProject(mavenProjectZ);
+        rule.setIncludeRootProject("false");
+        assertThatNoException().isThrownBy(rule::execute);
+
+    }
 }
