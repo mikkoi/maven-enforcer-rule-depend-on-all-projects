@@ -21,30 +21,42 @@ Example configuration
 
 Add the following snippet to the `build` section of the POM where you want the rule to run:
 
-    <plugins>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-enforcer-plugin</artifactId>
-            <version>3.1.0</version>
-            <executions>
-                <execution>
-                    <id>enforce-dependencies</id>
-                    <goals>
-                        <goal>enforce</goal>
-                    </goals>
-                    <configuration>
-                        <rules>
-                            <dependOnAllProjects implementation="${project.groupId}:${project.artifactId}:${project.version}">
-                                <includeRootProject>false</includeRootProject>
-                                <errorIfUnknownProject>false</errorIfUnknownProject>
-                            </dependOnAllProjects>
-                        </rules>
-                        <fail>true</fail>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
-    </plugins>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>3.6.2</version>
+        <dependencies>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>${project.artifactId}</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+        <executions>
+            <execution>
+                <id>depend-on-all-projects</id>
+                <phase>validate</phase>
+                <goals>
+                    <goal>enforce</goal>
+                </goals>
+                <configuration>
+                    <rules>
+                        <dependOnAllProjects>
+                            <includes>
+                                <include>main-*</include>
+                            </includes>
+                            <excludes>
+                                <exclude>main-project-excluded</exclude>
+                                <exclude>main-project-excluded-*:*:pom</exclude>
+                            </excludes>
+                            <includeRootProject>false</includeRootProject>
+                            <errorIfUnknownProject>true</errorIfUnknownProject>
+                        </dependOnAllProjects>
+                    </rules>
+                </configuration>
+            </execution>
+        </executions>
+    </plugin>
 
 Run the rule
 ------------
