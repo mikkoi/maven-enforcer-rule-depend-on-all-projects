@@ -424,7 +424,7 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
         getLog().debug("includedProjects=%s" + includedProjects);
         List<MavenProject> missingProjects = new ArrayList<>();
         for (MavenProject project : includedProjects) {
-            @SuppressWarnings("unchecked") List<Dependency> dependencies =
+            List<Dependency> dependencies =
                 currentProject.getDependencies();
             if (!dependenciesContains(dependencies, project)) {
                 missingProjects.add(project);
