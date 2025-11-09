@@ -33,6 +33,7 @@ class DependOnAllProjectsTest {
         assertThat(DependOnAllProjects.projectsContains(reactorProjects, "proj-a")).isTrue();
         assertThat(DependOnAllProjects.projectsContains(reactorProjects, "*")).isFalse();
         assertThat(DependOnAllProjects.projectsContains(reactorProjects, "mikkoi:*")).isFalse();
+        assertThat(DependOnAllProjects.projectsContains(reactorProjects, "*:proj-a")).isFalse();
         assertThat(DependOnAllProjects.projectsContains(reactorProjects, "mikkoi:*:pom")).isFalse();
         assertThat(DependOnAllProjects.projectsContains(reactorProjects, "*:*:pom")).isFalse();
         assertThat(DependOnAllProjects.projectsContains(reactorProjects, "proj-*")).isFalse();
@@ -167,5 +168,23 @@ class DependOnAllProjectsTest {
         dependencies.add(d4);
         assertThat(DependOnAllProjects.dependenciesContains(dependencies, p1)).isTrue();
         assertThat(DependOnAllProjects.dependenciesContains(dependencies, p2)).isFalse();
+    }
+
+    @Test
+    void testDependenciesAreEquals() {
+        Dependency d1 = createSimpleTestDependency("com.example", "my-artifact", "1.0.0", "jar");
+        Dependency d2 = createSimpleTestDependency("com.example", "my-artifact", "1.0.0", "jar");
+        Dependency d3 = createSimpleTestDependency("com.example", "my-artifact", "1.0.0", "war");
+        Dependency d4 = createSimpleTestDependency("com.example", "my-artifact", "1.1.0", "war");
+        Dependency d5 = createSimpleTestDependency("com.example", "my-artifact", "1.1.0", "pom");
+        Dependency d6 = createSimpleTestDependency("com.example", "other-artifact", "1.0.0", "jar");
+        Dependency d7 = createSimpleTestDependency("com.other", "other-artifact", "1.0.0", "jar");
+
+        assertThat(DependOnAllProjects.dependenciesAreEquals(d1, d2)).isTrue();
+        assertThat(DependOnAllProjects.dependenciesAreEquals(d1, d3)).isFalse();
+        assertThat(DependOnAllProjects.dependenciesAreEquals(d3, d4)).isFalse();
+        assertThat(DependOnAllProjects.dependenciesAreEquals(d4, d5)).isFalse();
+        assertThat(DependOnAllProjects.dependenciesAreEquals(d1, d6)).isFalse();
+        assertThat(DependOnAllProjects.dependenciesAreEquals(d1, d7)).isFalse();
     }
 }

@@ -218,35 +218,46 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
     }
 
     /**
-     * Does any of the projects in Maven Reactor build match with this project name?
-     * Name must not have a wildcard!
+     * Does any of the projects in the argument (Maven Reactor build) match with this project name?
+     * Attn. No wildcards are supported in projectName.
      *
      * @param projects    Iterable of MavenProject objects
-     * @param projectName Project name, e.g. "artifactId", "groupId:artifactId", "groupId:artifactId:packingType".
+     * @param projectName Project name, e.g. "artifactId", "groupId:artifactId", "groupId:artifactId:packagingType".
      * @return Boolean
      */
     public static boolean projectsContains(Iterable<MavenProject> projects, String projectName) {
-        List<String> ids = Arrays.asList(projectName.split(":"));
         for (MavenProject project : projects) {
-            if (ids.size() == 1) {
-                if (project.getArtifactId().equals(ids.get(0))) {
-                    return true;
-                }
-            } else if (ids.size() == 2) {
-                if (project.getGroupId().equals(ids.get(0))
-                    && project.getArtifactId().equals(ids.get(1))) {
-                    return true;
-                }
-            } else {
-                assert ids.size() == MAX_NUM_PARTS_IN_DEPENDENCY_DECLARATION;
-                if (project.getGroupId().equals(ids.get(0))
-                    && project.getArtifactId().equals(ids.get(1))
-                    && project.getPackaging().equals(ids.get(2))) {
-                    return true;
-                }
+            if (projectMatchesWithDefinition(project, projectName)) {
+                return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Does the MavenProject match with this jar name definition?
+     * Attn. If definition contains only artifactId, groupId and packagingType are ignored.
+     * Attn. If definition contains groupId and artifactId, packagingType is ignored.
+     * Attn. If definition contains groupId, artifactId and packagingType, all are matched.
+     * Attn. No wildcards are supported here.
+     *
+     * @param project           MavenProject object
+     * @param projectDefinition Project name, e.g. "artifactId", "groupId:artifactId", "groupId:artifactId:packagingType".
+     * @return Boolean
+     */
+    public static boolean projectMatchesWithDefinition(MavenProject project, String projectDefinition) {
+        List<String> ids = Arrays.asList(projectDefinition.split(":"));
+        if (ids.size() == 1) {
+            return project.getArtifactId().equals(ids.get(0));
+        } else if (ids.size() == 2) {
+            return project.getGroupId().equals(ids.get(0))
+                && project.getArtifactId().equals(ids.get(1));
+        } else {
+            // ids.size() is MAX_NUM_PARTS_IN_DEPENDENCY_DECLARATION;
+            return project.getGroupId().equals(ids.get(0))
+                && project.getArtifactId().equals(ids.get(1))
+                && project.getPackaging().equals(ids.get(2));
+        }
     }
 
     /**
@@ -412,6 +423,7 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
             getLog().debug("    " + projectId);
 
             if (isIncluded(project)) {
+                // Filter out current project and optionally root project (if includeRootProject is false)
                 if (projectsAreEquals(project, currentProject) || (!TRUE.equals(this.includeRootProject)
                     && projectsAreEquals(project, mavenSession.getTopLevelProject()))) {
                     getLog().debug("Filter out project: "
@@ -424,7 +436,7 @@ public class DependOnAllProjects extends AbstractEnforcerRule {
         getLog().debug("includedProjects=%s" + includedProjects);
         List<MavenProject> missingProjects = new ArrayList<>();
         for (MavenProject project : includedProjects) {
-            @SuppressWarnings("unchecked") List<Dependency> dependencies =
+            List<Dependency> dependencies =
                 currentProject.getDependencies();
             if (!dependenciesContains(dependencies, project)) {
                 missingProjects.add(project);
