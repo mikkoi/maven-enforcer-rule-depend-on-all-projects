@@ -1,2 +1,2 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-Maven Enforcer Rule dependOnAllProjects,com.github.mikkoi.maven.enforcer.rules,DependOnAllProjects,113,1113,28,106,17,186,26,62,0,21
+Maven Enforcer Rule dependOnAllProjects,com.github.mikkoi.maven.enforcer.rules,DependOnAllProjects,103,1121,20,112,16,184,19,68,0,21
